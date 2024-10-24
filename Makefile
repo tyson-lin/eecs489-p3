@@ -6,21 +6,13 @@ LDFLAGS =
 # Targets
 all: miProxy nameserver
 
-# Rule to compile miProxy executable
-miProxy: miProxy.o
-	$(CXX) $(LDFLAGS) -o miProxy miProxy.o
+# Rule to compile unoptimized sender
+wSender-base: wSender-base.o
+	$(CXX) $(LDFLAGS) -o wSender-base wSender-base.o
 
-# Rule to compile nameserver executable
-nameserver: nameserver.o
-	$(CXX) $(LDFLAGS) -o nameserver nameserver.o
-
-# Object file for miProxy
-miProxy.o: miProxy.cpp
-	$(CXX) $(CXXFLAGS) -c miProxy.cpp
-
-# Object file for nameserver
-nameserver.o: nameserver.cpp
-	$(CXX) $(CXXFLAGS) -c nameserver.cpp
+# Object file for wSender-base
+wSender-base.o: wSender-base.cpp
+	$(CXX) $(CXXFLAGS) -c wSender-base.cpp
 
 # Clean rule
 clean:
