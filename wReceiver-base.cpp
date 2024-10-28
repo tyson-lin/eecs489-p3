@@ -12,15 +12,24 @@
 #include <netdb.h>
 #include "crc32.h"
 #include "PacketHeader.h"
+#include <vector>
 
 using namespace std;
 
 #define MAX_PACKET_SIZE 1472
-
-int header_size = sizeof(PacketHeader);
+#define HEADER_SIZE sizeof(PacketHeader);
 
 int expected_seq_num = 0;
 bool currently_recieving = false;
+
+// open log file
+ofstream logfile(log_filename);
+
+struct Packet {
+    PacketHeader header;
+    char data[MAX_PACKET_SIZE];
+};
+vector<Packet> outstanding_packets;
 
 void send_packet(int server_fd, PacketHeader header, char* data = ""){
     send(server_fd,&header.type, 4, 0);
@@ -30,10 +39,10 @@ void send_packet(int server_fd, PacketHeader header, char* data = ""){
     if (header.length > 0){
         send(server_fd, data, header.length, 0);
     }
+    logfile << header.type << " " << header.seqNum << " " << header.length << " " header.checksum << endl;
 }
 
-char* recv_packet(int server_fd, PacketHeader& header){
-    char data[MAX_PACKET_SIZE - header_size];
+char* recv_packet(int server_fd, PacketHeader& header, char data[MAX_PACKET_SIZE - HEADER_SIZE]){
     recv(server_fd,&header.type, 4, MSG_WAITALL);
     recv(server_fd,&header.seqNum, 4, MSG_WAITALL);
     recv(server_fd,&header.length, 4, MSG_WAITALL);
@@ -41,6 +50,7 @@ char* recv_packet(int server_fd, PacketHeader& header){
     if (header.length > 0){
         recv(server_fd, data, header.length, MSG_WAITALL);
     }
+    logfile << header.type << " " << header.seqNum << " " << header.length << " " header.checksum << endl;
     return data;
 }
 
@@ -48,10 +58,8 @@ char* recv_packet(int server_fd, PacketHeader& header){
 // server
 void receiver(int port_num, int window_size, string output_dir, string log_filename) {
 
-    char buffer[MAX_PACKET_SIZE];
-
     // create socket and bind to port
-    int server_fd = socket(PF_INET, SOCK_DGRAM, 0);
+    int server_fd = socket(AF_INET, SOCK_DGRAM, 0);
 
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
@@ -59,19 +67,13 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;  // Bind to any available interface
     server_addr.sin_port = htons(port_num); // Port number
-    
-    // open log file
-    ofstream logfile(log_filename);
+
+    char buffer[MAX_PACKET_SIZE - HEADER_SIZE];
 
     while (1) {
         // read packet
         PacketHeader header;
-        buffer = recv_packet(server_fd, header);
-        // check crc
-        if (crc32(buffer, sizeof(buffer)) != header.checksum) {
-            // dropped packet
-            continue;
-        }
+        recv_packet(server_fd, header, buffer);
 
         // Receive START command and send ACK
         if (currently_receiving == false) {
@@ -81,22 +83,57 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 start_response.seqNum = header.seqNum;
                 start_response.length = 0;
                 send_packet(server_fd, start_response);
-                currently_recieving == true;
-                expected_seq_num  = 0;
+                currently_recieving = true;
+                expected_seq_num = 0;
             } 
         } 
         if (currently_recieving == true) {
-            
             if (header.type == TYPE_START) {
                 continue;
             } 
             if (header.type == TYPE_DATA) {
-                if (header.seqNum = expected_seq_num) {
-                    
+                // check crc because it's a data packet
+                if (crc32(buffer, header.length) != header.checksum) {
+                    continue;
+                }
+                if (header.seqNum == expected_seq_num) {
+                    expected_seq_num++;
+                    // TODO: PRINT BUFFER TO FILE
+                    // ======================================================================
+                    // sort through outstanding packets to check if we have anything of note
+                    while (true) {
+                        bool packet_found = false;
+                        for (int i = 0; i < outstanding_packets.size(); i++) {
+                            if (outstanding_packets[i].header.seqNum == expected_seq_num) {
+                                expected_seq_num++;
+                                packet_found = true;
+                                // TODO: PRINT BUFFER TO FILE
+                                // ======================================================================
+                            }
+                        }
+                    }
+                    PacketHeader ack_header = {TYPE_ACK, expected_seq_num, 0, 0};
+                } else 
+                // Packet within range
+                if (header.seqNum >= expected_seq_num + window_size) {
+                    Packet packet;
+                    packet.header = header;
+                    for (int i = 0; i < header.length; i++) {
+                        packet.data[i] = buffer[i];
+                    }
+
+                    // Add packet to list of outstanding packets ONLY if it
+                    // it's not already there
+                    bool packet_found = false;
+                    for (int i = 0; i < outstanding_packets.size(); i++) {
+                        if 
+                    }
+                }
+                
                 } else {
                     // didn't get expected, so send ack for expected seq num
-                    PacketHeader ac = {TYPE_ACK, expected_seq_num, 0, 0};
-                    send_packet(server_fd, ack_);
+                    PacketHeader ack_header = {TYPE_ACK, expected_seq_num, 0, 0};
+                    send_packet(server_fd, ack_header);
                 }
             } 
             if (header.type == TYPE_END) {
@@ -107,6 +144,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 send_packet(server_fd, end_response);
             } 
             if (header.type == TYPE_ACK) {
+                // shouldn't happen
                 continue;
             } 
         }
