@@ -25,7 +25,7 @@ using namespace std;
 int packet_size = 1472;
 int header_size = sizeof(PacketHeader);
 
-void send_packet(int client_fd, PacketHeader header, char* data = ""){
+void send_packet(int client_fd, PacketHeader header, const char* data = ""){
     send(client_fd,&header.type, 4, 0);
     send(client_fd,&header.seqNum, 4, 0);
     send(client_fd,&header.length, 4, 0);
@@ -47,25 +47,22 @@ char* recv_packet(int client_fd, PacketHeader& header){
 }
 
 void sender(string r_ip, int r_port, int window_size, string input, string log){
-    std::ifstream f(input, ifstream::binary);
-    int size = 0;        
-    f.read(reinterpret_cast<char *>(&size), sizeof(size));
-    
-    // Allocate a string, make it large enough to hold the input
-    string s;
-    s.resize(size);
-    
-    // read the text into the string
-    f.read(&s[0], s.size());
-    f.close();    
+    int fd = open(input.c_str(), 0);
+
+    string s = "";
+    char buf;
+    while (true){
+        int bytes = read(fd, &buf, 1);
+        if (bytes < 1 || buf == '\0'){
+            break;
+        }
+        s += buf;
+    }
     
     //cout << "buffer = \n" << s << '\n';
     int num_packets = (int)ceil((double) s.size() / (packet_size - header_size));
     cout << s.size() << " bytes to send, " << num_packets << " packets" << endl;
-   
-    cout << s << endl;
-
-
+    //cout << s << endl;
 
     int client_fd  = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     const int enable = 1;
@@ -78,7 +75,6 @@ void sender(string r_ip, int r_port, int window_size, string input, string log){
     server_addr.sin_addr.s_addr = inet_addr(r_ip.c_str());  // Server IP address
 
     // Connect to server
-    /*
     int success = connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
     if (!success){
         exit(1);
@@ -91,12 +87,35 @@ void sender(string r_ip, int r_port, int window_size, string input, string log){
     
     int highest_ack = -1;
     int seq_num = 0;
-    while (highest_ack != num_packets - 1){
+    fd_set rfds;
+    while (highest_ack != num_packets - 1) {
         for (int i = seq_num; i < seq_num + window_size && i < num_packets; ++i){
-            
+            string data;
+            header.type = 2;
+            header.seqNum = i;
+            //header.length = ;
+            //header.checksum = crc32(,);
+            send_packet(client_fd, header, data.c_str());
         }
+        for (auto start = std::chrono::steady_clock::now(), now = start; now < start + std::chrono::milliseconds{500} || highest_ack == (); now = std::chrono::steady_clock::now()){
+            FD_ZERO(&rfds);
+            FD_SET(client_fd, &rfds);
+            int activity = select(client_fd + 1, &rfds, NULL, NULL, NULL);
+            if (FD_ISSET(client_fd, &rfds)){
+                start = std::chrono::steady_clock::now();
+                string data = recv_packet(client_fd, header);
+                if (header.type == 3){
+                    highest_ack = header.seqNum;
+                }
+            }
+        } 
+        if (highest_ack > seq_num){
+            seq_num = highest_ack + 1;
+        } 
     }
-    */
+    header.type = 1;
+    header.seqNum = 0;
+    close(client_fd);
 }
 
 int main (int argc, char* argv[]){
