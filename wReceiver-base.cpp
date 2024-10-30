@@ -96,10 +96,13 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 if (crc32(buffer, header.length) != header.checksum) {
                     continue;
                 }
+
+                // Packet is the next desired packet
                 if (header.seqNum == expected_seq_num) {
                     expected_seq_num++;
                     // TODO: PRINT BUFFER TO FILE
                     // ======================================================================
+                    
                     // sort through outstanding packets to check if we have anything of note
                     while (true) {
                         bool packet_found = false;
@@ -107,9 +110,16 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                             if (outstanding_packets[i].header.seqNum == expected_seq_num) {
                                 expected_seq_num++;
                                 packet_found = true;
+                                outstanding_packets.erase(outstanding_packets+i);
                                 // TODO: PRINT BUFFER TO FILE
                                 // ======================================================================
+                                break;
                             }
+                        }
+
+                        // no interesting packets in outstanding set
+                        if (packet_found == false) {
+                            break;
                         }
                     }
                     PacketHeader ack_header = {TYPE_ACK, expected_seq_num, 0, 0};
@@ -126,22 +136,32 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     // it's not already there
                     bool packet_found = false;
                     for (int i = 0; i < outstanding_packets.size(); i++) {
-                        if 
+                        if (outstanding_packets[i].header.seqNum == header.seqNum) {
+                            packet_found = true;
+                        }
                     }
+                    if (packet_found == false) {
+                        outstanding_packets.push_back(packet);
+                    } 
+                    PacketHeader ack_header = {TYPE_ACK, expected_seq_num, 0, 0};
                 }
-                
-                } else {
+                else {
                     // didn't get expected, so send ack for expected seq num
                     PacketHeader ack_header = {TYPE_ACK, expected_seq_num, 0, 0};
                     send_packet(server_fd, ack_header);
                 }
             } 
             if (header.type == TYPE_END) {
+
+                // generate end response
                 PacketHeader end_response;
                 end_response.type = TYPE_ACK;
                 end_response.seqNum = header.seqNum;
                 end_response.length = 0;
                 send_packet(server_fd, end_response);
+
+                // set internal state
+                currently_recieving = false;
             } 
             if (header.type == TYPE_ACK) {
                 // shouldn't happen
