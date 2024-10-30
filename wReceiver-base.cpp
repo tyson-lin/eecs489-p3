@@ -22,8 +22,7 @@ using namespace std;
 int expected_seq_num = 0;
 bool currently_recieving = false;
 
-// open log file
-ofstream logfile(log_filename);
+ofstream logfile;
 
 struct Packet {
     PacketHeader header;
@@ -32,6 +31,7 @@ struct Packet {
 vector<Packet> outstanding_packets;
 
 void send_packet(int server_fd, PacketHeader header, char* data = ""){
+    header.checksum = crc32(data, header.length);
     send(server_fd,&header.type, 4, 0);
     send(server_fd,&header.seqNum, 4, 0);
     send(server_fd,&header.length, 4, 0);
@@ -39,10 +39,10 @@ void send_packet(int server_fd, PacketHeader header, char* data = ""){
     if (header.length > 0){
         send(server_fd, data, header.length, 0);
     }
-    logfile << header.type << " " << header.seqNum << " " << header.length << " " header.checksum << endl;
+    logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
 }
 
-char* recv_packet(int server_fd, PacketHeader& header, char data[MAX_PACKET_SIZE - HEADER_SIZE]){
+char* recv_packet(int server_fd, PacketHeader& header, char data[]){
     recv(server_fd,&header.type, 4, MSG_WAITALL);
     recv(server_fd,&header.seqNum, 4, MSG_WAITALL);
     recv(server_fd,&header.length, 4, MSG_WAITALL);
@@ -50,13 +50,15 @@ char* recv_packet(int server_fd, PacketHeader& header, char data[MAX_PACKET_SIZE
     if (header.length > 0){
         recv(server_fd, data, header.length, MSG_WAITALL);
     }
-    logfile << header.type << " " << header.seqNum << " " << header.length << " " header.checksum << endl;
+    logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     return data;
 }
 
 
 // server
 void receiver(int port_num, int window_size, string output_dir, string log_filename) {
+
+    logfile = ofstream(log_filename);
 
     // create socket and bind to port
     int server_fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -68,7 +70,9 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     server_addr.sin_addr.s_addr = INADDR_ANY;  // Bind to any available interface
     server_addr.sin_port = htons(port_num); // Port number
 
-    char buffer[MAX_PACKET_SIZE - HEADER_SIZE];
+    int data_size = MAX_PACKET_SIZE - HEADER_SIZE;
+    char buffer[data_size];
+
 
     while (1) {
         // read packet
@@ -76,7 +80,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
         recv_packet(server_fd, header, buffer);
 
         // Receive START command and send ACK
-        if (currently_receiving == false) {
+        if (currently_recieving == false) {
             if (header.type = TYPE_START) {
                 PacketHeader start_response;
                 start_response.type = TYPE_ACK;
@@ -101,8 +105,8 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 if (header.seqNum == expected_seq_num) {
                     expected_seq_num++;
                     // TODO: PRINT BUFFER TO FILE
+                    cout << buffer;
                     // ======================================================================
-                    
                     // sort through outstanding packets to check if we have anything of note
                     while (true) {
                         bool packet_found = false;
@@ -110,8 +114,9 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                             if (outstanding_packets[i].header.seqNum == expected_seq_num) {
                                 expected_seq_num++;
                                 packet_found = true;
-                                outstanding_packets.erase(outstanding_packets+i);
+                                outstanding_packets.erase(outstanding_packets.begin()+i);
                                 // TODO: PRINT BUFFER TO FILE
+                                cout << buffer;
                                 // ======================================================================
                                 break;
                             }

@@ -21,10 +21,12 @@
 
 using namespace std;
 
-int packet_size = 1472;
-int header_size = sizeof(PacketHeader);
+#define MAX_PACKET_SIZE 1472
+#define HEADER_SIZE 16
+#define DATA_SIZE MAX_PACKET_SIZE-HEADER_SIZE
 
 void send_packet(int client_fd, PacketHeader header, const char* data = ""){
+    header.checksum = crc32(data, header.length);
     send(client_fd,&header.type, 4, 0);
     send(client_fd,&header.seqNum, 4, 0);
     send(client_fd,&header.length, 4, 0);
@@ -34,7 +36,7 @@ void send_packet(int client_fd, PacketHeader header, const char* data = ""){
     }
 }
 char* recv_packet(int client_fd, PacketHeader& header){
-    char data[packet_size - header_size];
+    char data[DATA_SIZE];
     recv(client_fd,&header.type, 4, MSG_WAITALL);
     recv(client_fd,&header.seqNum, 4, MSG_WAITALL);
     recv(client_fd,&header.length, 4, MSG_WAITALL);
@@ -59,9 +61,8 @@ void sender(string r_ip, int r_port, int window_size, string input, string log){
     }
     
     //cout << "buffer = \n" << s << '\n';
-    int num_packets = (int)ceil((double) s.size() / (packet_size - header_size));
+    int num_packets = (int)ceil((double) s.size() / (DATA_SIZE));
     cout << s.size() << " bytes to send, " << num_packets << " packets" << endl;
-    //cout << s << endl;
 
     int client_fd  = socket(AF_INET, SOCK_DGRAM, 0);
     const int enable = 1;
@@ -87,16 +88,19 @@ void sender(string r_ip, int r_port, int window_size, string input, string log){
     int highest_ack = -1;
     int seq_num = 0;
     fd_set rfds;
+    int curr_index = 0;
     while (highest_ack != num_packets - 1) {
         for (int i = seq_num; i < seq_num + window_size && i < num_packets; ++i){
             string data;
             header.type = 2;
             header.seqNum = i;
-            //header.length = ;
-            //header.checksum = crc32(,);
+            header.length = min(DATA_SIZE, (int)s.size() - curr_index);
+            data = s.substr(curr_index, header.length);
+            curr_index += header.length;
+            header.checksum = crc32(data.c_str(),header.length);
             send_packet(client_fd, header, data.c_str());
         }
-        for (auto start = std::chrono::steady_clock::now(), now = start; now < start + std::chrono::milliseconds{500} || highest_ack == (); now = std::chrono::steady_clock::now()){
+        for (auto start = std::chrono::steady_clock::now(), now = start; now < start + std::chrono::milliseconds{500} || highest_ack < seq_num + 19; now = std::chrono::steady_clock::now()){
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
             int activity = select(client_fd + 1, &rfds, NULL, NULL, NULL);
@@ -114,6 +118,9 @@ void sender(string r_ip, int r_port, int window_size, string input, string log){
     }
     header.type = 1;
     header.seqNum = 0;
+    header.length = 0;
+    send_packet(client_fd, header);
+    recv_packet(client_fd, header);
     close(client_fd);
 }
 
