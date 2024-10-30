@@ -19,7 +19,6 @@
 #include "PacketHeader.h"
 #include "crc32.h"
 
-
 using namespace std;
 
 int packet_size = 1472;
@@ -64,7 +63,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log){
     cout << s.size() << " bytes to send, " << num_packets << " packets" << endl;
     //cout << s << endl;
 
-    int client_fd  = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    int client_fd  = socket(AF_INET, SOCK_DGRAM, 0);
     const int enable = 1;
     setsockopt(client_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
 
