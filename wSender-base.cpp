@@ -32,6 +32,8 @@ using namespace std;
 
 struct sockaddr_in server_addr;
 
+ofstream logfile;
+
 void send_packet(int client_fd, PacketHeader header, const char* data = ""){
     header.checksum = crc32(data, header.length);
     sendto(client_fd,&header.type, 4, 0, (sockaddr*)&server_addr, sizeof(server_addr));
@@ -41,6 +43,7 @@ void send_packet(int client_fd, PacketHeader header, const char* data = ""){
     if (header.length > 0){
         sendto(client_fd,data, header.length, 0, (sockaddr*)&server_addr, sizeof(server_addr));
     }
+    logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
 }
 char* recv_packet(int client_fd, PacketHeader& header){
     char data[DATA_SIZE];
@@ -52,6 +55,7 @@ char* recv_packet(int client_fd, PacketHeader& header){
     if (header.length > 0){
         recvfrom(client_fd,data, header.length, MSG_WAITALL,(sockaddr*)&server_addr, &len);
     }
+    logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     return data;
 }
 

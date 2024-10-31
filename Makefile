@@ -23,7 +23,7 @@ wReceiver-base.o: wReceiver-base.cpp
 	$(CXX) $(CXXFLAGS) -c wReceiver-base.cpp
 
 # Rule to compile wSender-opt 
-wSender-opt: wwSender-opt.o
+wSender-opt: wSender-opt.o
 	$(CXX) $(LDFLAGS) -o wSender-opt wSender-opt.o
 
 # Object file for wSender-opt 
