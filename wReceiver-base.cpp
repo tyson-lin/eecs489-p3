@@ -17,7 +17,8 @@
 using namespace std;
 
 #define MAX_PACKET_SIZE 1472
-#define HEADER_SIZE sizeof(PacketHeader);
+#define HEADER_SIZE 16
+#define DATA_SIZE MAX_PACKET_SIZE-HEADER_SIZE
 
 int expected_seq_num = 0;
 bool currently_recieving = false;
@@ -30,25 +31,30 @@ struct Packet {
 };
 vector<Packet> outstanding_packets;
 
+struct sockaddr_in server_addr, client_addr;
+socklen_t client_addr_len = sizeof(client_addr);
+
 void send_packet(int server_fd, PacketHeader header, char* data = ""){
     header.checksum = crc32(data, header.length);
-    send(server_fd,&header.type, 4, 0);
-    send(server_fd,&header.seqNum, 4, 0);
-    send(server_fd,&header.length, 4, 0);
-    send(server_fd,&header.checksum, 4, 0);
+    sendto(server_fd,&header.type, 4, 0, (sockaddr*)&client_addr, sizeof(client_addr));
+    sendto(server_fd,&header.seqNum, 4, 0, (sockaddr*)&client_addr, sizeof(client_addr));
+    sendto(server_fd,&header.length, 4, 0, (sockaddr*)&client_addr, sizeof(client_addr));
+    sendto(server_fd,&header.checksum, 4, 0, (sockaddr*)&client_addr, sizeof(client_addr));
     if (header.length > 0){
-        send(server_fd, data, header.length, 0);
+        sendto(server_fd, data, header.length, 0, (sockaddr*)&client_addr, sizeof(client_addr));
     }
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
 }
 
-char* recv_packet(int server_fd, PacketHeader& header, char data[]){
-    recv(server_fd,&header.type, 4, MSG_WAITALL);
-    recv(server_fd,&header.seqNum, 4, MSG_WAITALL);
-    recv(server_fd,&header.length, 4, MSG_WAITALL);
-    recv(server_fd,&header.checksum, 4, MSG_WAITALL);
+char* recv_packet(int server_fd, PacketHeader& header){
+    char data[DATA_SIZE];
+    socklen_t len = sizeof(server_addr);
+    recvfrom(server_fd,&header.type, 4, MSG_WAITALL,(sockaddr*)&client_addr, &len);
+    recvfrom(server_fd,&header.seqNum, 4, MSG_WAITALL,(sockaddr*)&client_addr, &len);
+    recvfrom(server_fd,&header.length, 4, MSG_WAITALL,(sockaddr*)&client_addr, &len);
+    recvfrom(server_fd,&header.checksum, 4, MSG_WAITALL,(sockaddr*)&client_addr, &len);
     if (header.length > 0){
-        recv(server_fd, data, header.length, MSG_WAITALL);
+        recvfrom(server_fd,data, header.length, MSG_WAITALL,(sockaddr*)&server_addr, &len);
     }
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     return data;
@@ -63,25 +69,24 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     // create socket and bind to port
     int server_fd = socket(AF_INET, SOCK_DGRAM, 0);
 
-    struct sockaddr_in server_addr, client_addr;
-    socklen_t client_addr_len = sizeof(client_addr);
-
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;  // Bind to any available interface
     server_addr.sin_port = htons(port_num); // Port number
 
+    bind(server_fd, (sockaddr*) &server_addr, sizeof(server_addr));
+
     int data_size = MAX_PACKET_SIZE - HEADER_SIZE;
-    char buffer[data_size];
+    char* buffer;
 
 
     while (1) {
         // read packet
         PacketHeader header;
-        recv_packet(server_fd, header, buffer);
+        buffer = recv_packet(server_fd, header);
 
         // Receive START command and send ACK
         if (currently_recieving == false) {
-            if (header.type = TYPE_START) {
+            if (header.type == TYPE_START) {
                 PacketHeader start_response;
                 start_response.type = TYPE_ACK;
                 start_response.seqNum = header.seqNum;
@@ -90,8 +95,8 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 currently_recieving = true;
                 expected_seq_num = 0;
             } 
-        } 
-        if (currently_recieving == true) {
+        } else if (currently_recieving == true) {
+            cout << "how" << endl;
             if (header.type == TYPE_START) {
                 continue;
             } 

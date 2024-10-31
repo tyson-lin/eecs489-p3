@@ -9,6 +9,11 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <netinet/tcp.h>
+#include <unistd.h> 
+#include <sys/types.h> 
+#include <sys/socket.h> 
+#include <arpa/inet.h> 
+#include <netinet/in.h> 
 #include <fcntl.h>
 #include <cassert>
 #include <chrono>
@@ -25,24 +30,27 @@ using namespace std;
 #define HEADER_SIZE 16
 #define DATA_SIZE MAX_PACKET_SIZE-HEADER_SIZE
 
+struct sockaddr_in server_addr;
+
 void send_packet(int client_fd, PacketHeader header, const char* data = ""){
     header.checksum = crc32(data, header.length);
-    send(client_fd,&header.type, 4, 0);
-    send(client_fd,&header.seqNum, 4, 0);
-    send(client_fd,&header.length, 4, 0);
-    send(client_fd,&header.checksum, 4, 0);
+    sendto(client_fd,&header.type, 4, 0, (sockaddr*)&server_addr, sizeof(server_addr));
+    sendto(client_fd,&header.seqNum, 4, 0, (sockaddr*)&server_addr, sizeof(server_addr));
+    sendto(client_fd,&header.length, 4, 0, (sockaddr*)&server_addr, sizeof(server_addr));
+    sendto(client_fd,&header.checksum, 4, 0, (sockaddr*)&server_addr, sizeof(server_addr));
     if (header.length > 0){
-        send(client_fd,data, header.length, 0);
+        sendto(client_fd,data, header.length, 0, (sockaddr*)&server_addr, sizeof(server_addr));
     }
 }
 char* recv_packet(int client_fd, PacketHeader& header){
     char data[DATA_SIZE];
-    recv(client_fd,&header.type, 4, MSG_WAITALL);
-    recv(client_fd,&header.seqNum, 4, MSG_WAITALL);
-    recv(client_fd,&header.length, 4, MSG_WAITALL);
-    recv(client_fd,&header.checksum, 4, MSG_WAITALL);
+    socklen_t len = sizeof(server_addr);
+    recvfrom(client_fd,&header.type, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
+    recvfrom(client_fd,&header.seqNum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
+    recvfrom(client_fd,&header.length, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
+    recvfrom(client_fd,&header.checksum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
     if (header.length > 0){
-        recv(client_fd,data, header.length, MSG_WAITALL);
+        recvfrom(client_fd,data, header.length, MSG_WAITALL,(sockaddr*)&server_addr, &len);
     }
     return data;
 }
@@ -69,21 +77,22 @@ void sender(string r_ip, int r_port, int window_size, string input, string log){
     setsockopt(client_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
 
     // Make socket address
-    struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;              // IPv4
     server_addr.sin_port = htons(r_port);            // Port number (convert to network byte order)
     server_addr.sin_addr.s_addr = inet_addr(r_ip.c_str());  // Server IP address
 
     // Connect to server
-    int success = connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
-    if (!success){
-        exit(1);
-    }
     cout << "connected to " << r_ip << endl;
     PacketHeader header;
     header.type = 0;
     header.length = 0;
     send_packet(client_fd, header);
+
+    cout << "start sent" << endl;
+
+    recv_packet(client_fd, header);
+
+    cout << "ack recved" << endl;
     
     int highest_ack = -1;
     int seq_num = 0;
@@ -108,6 +117,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log){
                 start = std::chrono::steady_clock::now();
                 string data = recv_packet(client_fd, header);
                 if (header.type == 3){
+                    cout << header.seqNum << endl;
                     highest_ack = header.seqNum;
                 }
             }
