@@ -75,7 +75,6 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
 
     bind(server_fd, (sockaddr*) &server_addr, sizeof(server_addr));
 
-    int data_size = MAX_PACKET_SIZE - HEADER_SIZE;
     char buffer[MAX_PACKET_SIZE];
 
 
@@ -133,7 +132,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                             break;
                         }
                     }
-                    PacketHeader ack_header = {TYPE_ACK, expected_seq_num, 0, 0};
+                    PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
                 } else 
                 // Packet within range
                 if (header.seqNum >= expected_seq_num + window_size) {
@@ -154,11 +153,11 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     if (packet_found == false) {
                         outstanding_packets.push_back(packet);
                     } 
-                    PacketHeader ack_header = {TYPE_ACK, expected_seq_num, 0, 0};
+                    PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
                 }
                 else {
                     // didn't get expected, so send ack for expected seq num
-                    PacketHeader ack_header = {TYPE_ACK, expected_seq_num, 0, 0};
+                    PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
                     send_packet(server_fd, ack_header);
                 }
             } 
