@@ -115,7 +115,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     // sort through outstanding packets to check if we have anything of note
                     while (true) {
                         bool packet_found = false;
-                        for (int i = 0; i < outstanding_packets.size(); i++) {
+                        for (size_t i = 0; i < outstanding_packets.size(); i++) {
                             if (outstanding_packets[i].header.seqNum == expected_seq_num) {
                                 expected_seq_num++;
                                 packet_found = true;
