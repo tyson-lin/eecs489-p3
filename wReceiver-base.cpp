@@ -96,11 +96,11 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 expected_seq_num = 0;
             } 
         } else if (currently_recieving == true) {
-            cout << "how" << endl;
             if (header.type == TYPE_START) {
                 continue;
             } 
             if (header.type == TYPE_DATA) {
+                cout << "Here" << endl;
                 // check crc because it's a data packet
                 if (crc32(buffer, header.length) != header.checksum) {
                     continue;
