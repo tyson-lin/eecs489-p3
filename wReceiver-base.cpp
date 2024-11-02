@@ -133,6 +133,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                         }
                     }
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
+                    send_packet(server_fd, ack_header);
                 } else 
                 // Packet within range
                 if (header.seqNum >= (unsigned int)expected_seq_num + (unsigned int)window_size) {
