@@ -44,7 +44,7 @@ void send_packet(int client_fd, PacketHeader header, const char* data = ""){
         sendto(client_fd,data, header.length, 0, (sockaddr*)&server_addr, sizeof(server_addr));
     }
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
-    cout << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
+    cout << "Sending " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
 }
 char* recv_packet(int client_fd, PacketHeader& header){
     char data[DATA_SIZE];
@@ -57,7 +57,7 @@ char* recv_packet(int client_fd, PacketHeader& header){
         recvfrom(client_fd,data, header.length, MSG_WAITALL,(sockaddr*)&server_addr, &len);
     }
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
-    cout << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
+    cout << "Receiving " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     return data;
 }
 
