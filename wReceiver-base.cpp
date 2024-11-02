@@ -24,6 +24,8 @@ int expected_seq_num = 0;
 bool currently_recieving = false;
 
 ofstream logfile;
+
+string outfile_name;
 ofstream outfile;
 
 struct Packet {
@@ -94,9 +96,8 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 expected_seq_num = 0;
 
                 // Setup output file
-                string output = output_dir + "File-" + to_string(connection_count) + ".out";
-                cout << "Output file location: " << output << endl;
-                outfile.open(output);
+                string outfile_name = output_dir + "File-" + to_string(connection_count) + ".out";
+                cout << "Output file location: " << outfile_name << endl;
 
                 // Send ACK
                 PacketHeader start_response;
@@ -123,7 +124,9 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
                     expected_seq_num++;
                     // TODO: PRINT BUFFER TO FILE
+                    outfile.open(outfile_name);
                     outfile << buffer;
+                    outfile.close();
                     // ======================================================================
                     // sort through outstanding packets to check if we have anything of note
                     while (true) {
@@ -134,8 +137,9 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                                 packet_found = true;
                                 outstanding_packets.erase(outstanding_packets.begin()+i);
                                 // TODO: PRINT BUFFER TO FILE
+                                outfile.open(outfile_name);
                                 outfile << buffer;
-                                cout << buffer;
+                                outfile.close();
                                 // ======================================================================
                                 break;
                             }

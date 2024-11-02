@@ -4,6 +4,11 @@
         "ostream": "cpp",
         "iostream": "cpp",
         "xlocale": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "fstream": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "vector": "cpp",
+        "xhash": "cpp"
     }
 }
