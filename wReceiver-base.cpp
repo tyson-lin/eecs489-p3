@@ -95,6 +95,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
 
                 // Setup output file
                 string output = output_dir + "File-" + to_string(connection_count) + ".out";
+                cout << "Output file location: " << output << endl;
                 outfile = ofstream(output);
 
                 // Send ACK
