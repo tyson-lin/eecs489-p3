@@ -124,6 +124,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
                     expected_seq_num++;
                     // TODO: PRINT BUFFER TO FILE
+                    cout << buffer << endl;
                     outfile.open(outfile_name);
                     outfile << buffer;
                     outfile.close();
@@ -137,6 +138,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                                 packet_found = true;
                                 outstanding_packets.erase(outstanding_packets.begin()+i);
                                 // TODO: PRINT BUFFER TO FILE
+                                cout << buffer << endl;
                                 outfile.open(outfile_name);
                                 outfile << buffer;
                                 outfile.close();
