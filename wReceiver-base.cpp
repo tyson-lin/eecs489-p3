@@ -76,7 +76,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     bind(server_fd, (sockaddr*) &server_addr, sizeof(server_addr));
 
     int data_size = MAX_PACKET_SIZE - HEADER_SIZE;
-    char* buffer[MAX_PACKET_SIZE];
+    char buffer[MAX_PACKET_SIZE];
 
 
     while (1) {
