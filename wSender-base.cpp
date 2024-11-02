@@ -130,6 +130,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
                     highest_ack = header.seqNum;
                 }
             }
+            cout << now << endl;
         } 
         cout << "Here 2" << endl;
         if (highest_ack > seq_num){
