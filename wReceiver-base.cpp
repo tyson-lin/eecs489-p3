@@ -46,8 +46,7 @@ void send_packet(int server_fd, PacketHeader header, char* data = ""){
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
 }
 
-char* recv_packet(int server_fd, PacketHeader& header){
-    char data[DATA_SIZE];
+void recv_packet(int server_fd, PacketHeader& header, char* data){
     socklen_t len = sizeof(server_addr);
     recvfrom(server_fd,&header.type, 4, MSG_WAITALL,(sockaddr*)&client_addr, &len);
     recvfrom(server_fd,&header.seqNum, 4, MSG_WAITALL,(sockaddr*)&client_addr, &len);
@@ -82,7 +81,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     while (1) {
         // read packet
         PacketHeader header;
-        buffer = recv_packet(server_fd, header);
+        recv_packet(server_fd, header, buffer);
 
         // Receive START command and send ACK
         if (currently_recieving == false) {
