@@ -118,6 +118,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             send_packet(client_fd, header, data.c_str());
         }
         if (highest_ack == num_packets - 1) {
+            cout << "Here" << endl;
             break;
         }
         for (auto start = std::chrono::steady_clock::now(), now = start; now < start + std::chrono::milliseconds{500} || highest_ack < seq_num + 19; now = std::chrono::steady_clock::now()){
