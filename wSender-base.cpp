@@ -137,6 +137,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     header.type = 1;
     header.seqNum = 0;
     header.length = 0;
+    cout << "Here" << endl;
     send_packet(client_fd, header);
     recv_packet(client_fd, header);
     close(client_fd);
