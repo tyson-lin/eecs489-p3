@@ -105,7 +105,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 if (crc32(buffer, header.length) != header.checksum) {
                     continue;
                 }
-
+                cout << "Sequence Number: " << header.seqNum << endl;
                 // Packet is the next desired packet
                 if (header.seqNum == expected_seq_num) {
                     expected_seq_num++;
