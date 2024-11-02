@@ -126,7 +126,10 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     // TODO: PRINT BUFFER TO FILE
                     cout << buffer << endl;
                     outfile.open(outfile_name);
-                    outfile << buffer;
+                    if (outfile.is_open()) {
+                        cout << "Printing to " << outfile_name << endl;
+                        outfile << buffer;
+                    }
                     outfile.close();
                     // ======================================================================
                     // sort through outstanding packets to check if we have anything of note
@@ -140,7 +143,10 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                                 // TODO: PRINT BUFFER TO FILE
                                 cout << buffer << endl;
                                 outfile.open(outfile_name);
-                                outfile << buffer;
+                                if (outfile.is_open()) {
+                                    cout << "Printing to " << outfile_name << endl;
+                                    outfile << buffer;
+                                }
                                 outfile.close();
                                 // ======================================================================
                                 break;
