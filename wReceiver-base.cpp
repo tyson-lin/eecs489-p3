@@ -56,6 +56,7 @@ void recv_packet(int server_fd, PacketHeader& header, char* data){
         recvfrom(server_fd,data, header.length, MSG_WAITALL,(sockaddr*)&server_addr, &len);
     }
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
+    cout << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     return data;
 }
 
