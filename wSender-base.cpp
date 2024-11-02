@@ -59,7 +59,9 @@ char* recv_packet(int client_fd, PacketHeader& header){
     return data;
 }
 
-void sender(string r_ip, int r_port, int window_size, string input, string log){
+void sender(string r_ip, int r_port, int window_size, string input, string log_filename){
+    logfile = ofstream(log_filename);
+
     int fd = open(input.c_str(), 0);
 
     string s = "";
