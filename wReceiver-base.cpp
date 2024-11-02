@@ -129,6 +129,8 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     if (outfile.is_open()) {
                         cout << "Printing to " << outfile_name << endl;
                         outfile << buffer;
+                    } else {
+                        cout << "Failed to open " << outfile_name << endl;
                     }
                     outfile.close();
                     // ======================================================================
@@ -146,6 +148,8 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                                 if (outfile.is_open()) {
                                     cout << "Printing to " << outfile_name << endl;
                                     outfile << buffer;
+                                } else {
+                                    cout << "Failed to open " << outfile_name << endl;
                                 }
                                 outfile.close();
                                 // ======================================================================
