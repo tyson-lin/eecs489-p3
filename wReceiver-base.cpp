@@ -24,6 +24,7 @@ int expected_seq_num = 0;
 bool currently_recieving = false;
 
 ofstream logfile;
+ofstream outfile;
 
 struct Packet {
     PacketHeader header;
@@ -33,6 +34,8 @@ vector<Packet> outstanding_packets;
 
 struct sockaddr_in server_addr, client_addr;
 socklen_t client_addr_len = sizeof(client_addr);
+
+unsigned int connection_count = 0;
 
 void send_packet(int server_fd, PacketHeader header, char* data = ""){
     header.checksum = crc32(data, header.length);
@@ -86,13 +89,22 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
         // Receive START command and send ACK
         if (currently_recieving == false) {
             if (header.type == TYPE_START) {
+                // We are now receiving
+                currently_recieving = true;
+                expected_seq_num = 0;
+
+                // Setup output file
+                string output = output_dir + "File-" + to_string(connection_count) + ".out";
+                outfile = ofstream(output);
+
+                // Send ACK
                 PacketHeader start_response;
                 start_response.type = TYPE_ACK;
                 start_response.seqNum = header.seqNum;
                 start_response.length = 0;
                 send_packet(server_fd, start_response);
-                currently_recieving = true;
-                expected_seq_num = 0;
+
+
             } 
         } else if (currently_recieving == true) {
             if (header.type == TYPE_START) {
@@ -110,7 +122,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
                     expected_seq_num++;
                     // TODO: PRINT BUFFER TO FILE
-                    cout << buffer;
+                    outfile << buffer;
                     // ======================================================================
                     // sort through outstanding packets to check if we have anything of note
                     while (true) {
@@ -121,6 +133,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                                 packet_found = true;
                                 outstanding_packets.erase(outstanding_packets.begin()+i);
                                 // TODO: PRINT BUFFER TO FILE
+                                outfile << buffer;
                                 cout << buffer;
                                 // ======================================================================
                                 break;
@@ -174,6 +187,9 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
 
                 // set internal state
                 currently_recieving = false;
+
+                // increase connection count
+                connection_count++;
             } 
             if (header.type == TYPE_ACK) {
                 // shouldn't happen
