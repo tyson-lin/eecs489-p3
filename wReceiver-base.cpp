@@ -107,7 +107,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 }
                 cout << "Sequence Number: " << header.seqNum << endl;
                 // Packet is the next desired packet
-                if ((unsigned int)(header.seqNum) == expected_seq_num) {
+                if ((header.seqNum) == (unsigned int)expected_seq_num) {
                     expected_seq_num++;
                     // TODO: PRINT BUFFER TO FILE
                     cout << buffer;
@@ -135,17 +135,17 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
                 } else 
                 // Packet within range
-                if (header.seqNum >= expected_seq_num + window_size) {
+                if (header.seqNum >= (unsigned int)expected_seq_num + (unsigned int)window_size) {
                     Packet packet;
                     packet.header = header;
-                    for (int i = 0; i < header.length; i++) {
+                    for (unsigned int i = 0; i < header.length; i++) {
                         packet.data[i] = buffer[i];
                     }
 
                     // Add packet to list of outstanding packets ONLY if it
                     // it's not already there
                     bool packet_found = false;
-                    for (int i = 0; i < outstanding_packets.size(); i++) {
+                    for (size_t i = 0; i < outstanding_packets.size(); i++) {
                         if (outstanding_packets[i].header.seqNum == header.seqNum) {
                             packet_found = true;
                         }
