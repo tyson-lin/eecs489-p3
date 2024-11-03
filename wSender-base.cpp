@@ -46,8 +46,7 @@ void send_packet(int client_fd, PacketHeader header, const char* data = ""){
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Sending " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
 }
-char* recv_packet(int client_fd, PacketHeader& header){
-    char data[DATA_SIZE];
+void recv_packet(int client_fd, PacketHeader& header, char* data){
     socklen_t len = sizeof(server_addr);
     recvfrom(client_fd,&header.type, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
     recvfrom(client_fd,&header.seqNum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
@@ -58,7 +57,6 @@ char* recv_packet(int client_fd, PacketHeader& header){
     }
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Receiving " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
-    return data;
 }
 
 void sender(string r_ip, int r_port, int window_size, string input, string log_filename){
@@ -98,7 +96,8 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
 
     cout << "start sent" << endl;
 
-    recv_packet(client_fd, header);
+    char data[DATA_SIZE];
+    recv_packet(client_fd, header, data);
 
     cout << "ack recved" << endl;
     
@@ -107,7 +106,8 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     fd_set rfds;
     int curr_index = 0;
     while (highest_ack != num_packets - 1) {
-        for (int i = seq_num; i < seq_num + window_size && i < num_packets; ++i){
+        int w_size = min(window_size, num_packets - seq_num);
+        for (int i = seq_num; i < seq_num + w_size; ++i){
             string data;
             header.type = 2;
             header.seqNum = i;
@@ -117,30 +117,32 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             header.checksum = crc32(data.c_str(),header.length);
             send_packet(client_fd, header, data.c_str());
         }
-        cout << "Here 1" << endl;
-        for (auto start = std::chrono::steady_clock::now(), now = start; now < start + std::chrono::milliseconds{500} || highest_ack < seq_num + 19; now = std::chrono::steady_clock::now()){
+        for (auto start = std::chrono::steady_clock::now(), now = start; now < start + std::chrono::milliseconds{500} && highest_ack < seq_num + w_size - 1; now = std::chrono::steady_clock::now()){
+            //cout << "Here 1" << endl;
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
             int activity = select(client_fd + 1, &rfds, NULL, NULL, NULL);
             if (FD_ISSET(client_fd, &rfds)){
                 start = std::chrono::steady_clock::now();
-                string data = recv_packet(client_fd, header);
+                 //cout << "Here 2" << endl;
+                recv_packet(client_fd, header, data);
+                 //cout << "Here 3" << endl;
                 if (header.type == 3){
                     cout << header.seqNum << endl;
                     highest_ack = header.seqNum;
                 }
             }
         } 
-        cout << "Here 2" << endl;
         if (highest_ack > seq_num){
             seq_num = highest_ack + 1;
         } 
+        cout << highest_ack << " " << seq_num << endl;
     }
     header.type = 1;
     header.seqNum = 0;
     header.length = 0;
     send_packet(client_fd, header);
-    recv_packet(client_fd, header);
+    recv_packet(client_fd, header, data);
     close(client_fd);
 }
 

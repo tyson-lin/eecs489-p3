@@ -122,7 +122,6 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 cout << "Sequence Number: " << header.seqNum << endl;
                 // Packet is the next desired packet
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
-                    expected_seq_num++;
                     // TODO: PRINT BUFFER TO FILE
                     cout << buffer << endl;
                     outfile.open(outfile_name);
@@ -163,6 +162,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                         }
                     }
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
+                    expected_seq_num++;
                     send_packet(server_fd, ack_header);
                 } else 
                 // Packet within range
