@@ -55,6 +55,7 @@ bool recv_packet(int client_fd, sockaddr_in * addr, PacketHeader * header, ofstr
     
     memcpy(header, recv_data, HEADER_SIZE);
     memcpy(data, recv_data+HEADER_SIZE, DATA_SIZE);
+    data[-1] = '\0';
     cout << data << endl << endl << endl;
     
 
