@@ -152,16 +152,18 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                                 }
                                 outfile.close();
                                 // ======================================================================
+                                cout << "Here1" << endl;
                                 break;
                             }
                         }
 
                         // no interesting packets in outstanding set
                         if (packet_found == false) {
+                            cout << "Here2" << endl;
                             break;
                         }
                     }
-                    cout << "HERE" << endl;
+                    cout << "Here3" << endl;
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
                     expected_seq_num++;
                     send_packet(server_fd, ack_header);
