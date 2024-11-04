@@ -101,7 +101,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
                 }
             }
             auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(start-now);
-            cout << "Timer: " << elapsed_time << endl;
+            cout << "Timer: " << elapsed_time.count() << endl;
         } 
         cout << "Here 4" << endl;
         if (highest_ack > seq_num){
