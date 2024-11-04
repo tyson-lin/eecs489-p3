@@ -75,7 +75,7 @@ bool recv_packet(int client_fd, sockaddr_in * addr, PacketHeader * header, ofstr
     logfile << header->type << " " << header->seqNum << " " << header->length << " " << header->checksum << endl;
     cout << "Receiving " << header->type << " " << header->seqNum << " " << header->length << " " << header->checksum << endl;
 
-    if (crc32(data, header.length) != header->checksum) {
+    if (crc32(data, header->length) != header->checksum) {
         return false;
     }
     return true;
