@@ -90,6 +90,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
             int activity = select(client_fd + 1, &rfds, NULL, NULL, NULL);
+            cout << "Here 5" << endl;
             if (FD_ISSET(client_fd, &rfds)){
                 start = std::chrono::steady_clock::now();
                 cout << "Here 2" << endl;
