@@ -3,6 +3,7 @@
 
 #include <sys/socket.h>
 #include <iostream>
+#include <fstream>
 
 #define TYPE_START 0
 #define TYPE_END 1
