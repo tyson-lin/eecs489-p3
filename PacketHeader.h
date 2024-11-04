@@ -71,8 +71,8 @@ bool recv_packet(int client_fd, sockaddr_in * addr, PacketHeader * header, ofstr
     header->length = ntohl(header->length);
     header->checksum = ntohl(header->checksum);
 
-    logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
-    cout << "Receiving " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
+    logfile << header->type << " " << header->seqNum << " " << header->length << " " << header->checksum << endl;
+    cout << "Receiving " << header->type << " " << header->seqNum << " " << header->length << " " << header->checksum << endl;
 
     if (crc32(data, PACKET_SIZE) != header->checksum) {
         return false;
