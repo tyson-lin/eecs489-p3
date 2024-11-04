@@ -20,7 +20,7 @@ struct PacketHeader
     unsigned int checksum; // 32-bit CRC
 };
 
-void send_packet(int client_fd, PacketHeader header, ofstream logfile, const char* data = ""){
+void send_packet(int client_fd, PacketHeader header, ofstream& logfile, const char* data = ""){
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Sending " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     header.checksum = crc32(data, header.length);
@@ -40,7 +40,8 @@ void send_packet(int client_fd, PacketHeader header, ofstream logfile, const cha
         sendto(client_fd,data, host_order_length, 0, (sockaddr*)&server_addr, sizeof(server_addr));
     }
 }
-void recv_packet(int client_fd, PacketHeader& header, ofstream logfile, char* data){
+
+void recv_packet(int client_fd, PacketHeader& header, ofstream& logfile, char* data){
     socklen_t len = sizeof(server_addr);
     recvfrom(client_fd,&header.type, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
     recvfrom(client_fd,&header.seqNum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
