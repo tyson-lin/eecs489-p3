@@ -22,7 +22,7 @@ struct PacketHeader
     unsigned int checksum; // 32-bit CRC
 };
 
-void send_packet(int client_fd, sockaddr_in server_addr, PacketHeader header, ofstream& logfile, const char* data = ""){
+void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream& logfile, const char* data = ""){
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Sending " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     header.checksum = crc32(data, header.length);
@@ -34,21 +34,21 @@ void send_packet(int client_fd, sockaddr_in server_addr, PacketHeader header, of
     header.length = htonl(header.length);
     header.checksum = htonl(header.checksum);
 
-    sendto(client_fd,&header.type, 4, 0, (sockaddr*)&server_addr, sizeof(server_addr));
-    sendto(client_fd,&header.seqNum, 4, 0, (sockaddr*)&server_addr, sizeof(server_addr));
-    sendto(client_fd,&header.length, 4, 0, (sockaddr*)&server_addr, sizeof(server_addr));
-    sendto(client_fd,&header.checksum, 4, 0, (sockaddr*)&server_addr, sizeof(server_addr));
+    sendto(client_fd,&header.type, 4, 0, (sockaddr*)&addr, sizeof(addr));
+    sendto(client_fd,&header.seqNum, 4, 0, (sockaddr*)&addr, sizeof(addr));
+    sendto(client_fd,&header.length, 4, 0, (sockaddr*)&addr, sizeof(addr));
+    sendto(client_fd,&header.checksum, 4, 0, (sockaddr*)&addr, sizeof(addr));
     if (header.length > 0){
         sendto(client_fd,data, host_order_length, 0, (sockaddr*)&server_addr, sizeof(server_addr));
     }
 }
 
-void recv_packet(int client_fd, sockaddr_in server_addr, PacketHeader& header, ofstream& logfile, char* data){
-    socklen_t len = sizeof(server_addr);
-    recvfrom(client_fd,&header.type, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
-    recvfrom(client_fd,&header.seqNum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
-    recvfrom(client_fd,&header.length, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
-    recvfrom(client_fd,&header.checksum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
+void recv_packet(int client_fd, sockaddr_in * addr, PacketHeader& header, ofstream& logfile, char* data){
+    socklen_t len = sizeof(*addr);
+    recvfrom(client_fd,&header.type, 4, MSG_WAITALL,(sockaddr*)addr, &len);
+    recvfrom(client_fd,&header.seqNum, 4, MSG_WAITALL,(sockaddr*)addr, &len);
+    recvfrom(client_fd,&header.length, 4, MSG_WAITALL,(sockaddr*)addr, &len);
+    recvfrom(client_fd,&header.checksum, 4, MSG_WAITALL,(sockaddr*)addr, &len);
 
     header.type = ntohl(header.type);
     header.seqNum = ntohl(header.seqNum);
@@ -56,7 +56,7 @@ void recv_packet(int client_fd, sockaddr_in server_addr, PacketHeader& header, o
     header.checksum = ntohl(header.checksum);
 
     if (header.length > 0){
-        recvfrom(client_fd,data, header.length, MSG_WAITALL,(sockaddr*)&server_addr, &len);
+        recvfrom(client_fd,data, header.length, MSG_WAITALL,(sockaddr*)addr, &len);
     }
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Receiving " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;

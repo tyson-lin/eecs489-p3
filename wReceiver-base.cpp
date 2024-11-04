@@ -47,10 +47,10 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     // create socket and bind to port
     int server_fd = socket(AF_INET, SOCK_DGRAM, 0);
 
+    memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;  // Bind to any available interface
     server_addr.sin_port = htons(port_num); // Port number
-
     bind(server_fd, (sockaddr*) &server_addr, sizeof(server_addr));
 
     char buffer[MAX_PACKET_SIZE];

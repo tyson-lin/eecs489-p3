@@ -27,7 +27,7 @@ using namespace std;
 #define HEADER_SIZE 16
 #define DATA_SIZE MAX_PACKET_SIZE-HEADER_SIZE
 
-struct sockaddr_in server_addr;
+struct sockaddr_in server_addr, client_addr;
 
 ofstream logfile;
 
@@ -56,8 +56,9 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
 
     // Make socket address
     server_addr.sin_family = AF_INET;              // IPv4
-    server_addr.sin_port = htons(r_port);            // Port number (convert to network byte order)
     server_addr.sin_addr.s_addr = inet_addr(r_ip.c_str());  // Server IP address
+    server_addr.sin_port = htons(r_port);            // Port number (convert to network byte order)
+    //bind(server_fd, (sockaddr*) &server_addr, sizeof(server_addr));
 
     // Connect to server
     cout << "connected to " << r_ip << endl;
