@@ -5,6 +5,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "crc32.h"
+
 using namespace std;
 
 #define TYPE_START 0

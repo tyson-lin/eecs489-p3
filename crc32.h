@@ -1,3 +1,6 @@
+#ifndef CRC32_H
+#define CRC32_H
+
 /*-
  *  COPYRIGHT (C) 1986 Gary S. Brown.  You may use this program, or
  *  code or tables extracted from it, as desired without restriction.
@@ -102,3 +105,5 @@ crc32(const void *buf, size_t size)
 
 	return crc ^ ~0U;
 }
+
+#endif
