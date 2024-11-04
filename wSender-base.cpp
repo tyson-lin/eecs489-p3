@@ -117,22 +117,22 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             header.checksum = crc32(data.c_str(),header.length);
             send_packet(client_fd, header, data.c_str());
         }
-        for (auto start = std::chrono::steady_clock::now(), now = start; now < start + std::chrono::milliseconds{500} && highest_ack < seq_num + w_size - 1; now = std::chrono::steady_clock::now()){
-            //cout << "Here 1" << endl;
-            FD_ZERO(&rfds);
-            FD_SET(client_fd, &rfds);
-            int activity = select(client_fd + 1, &rfds, NULL, NULL, NULL);
-            if (FD_ISSET(client_fd, &rfds)){
-                start = std::chrono::steady_clock::now();
-                 //cout << "Here 2" << endl;
-                recv_packet(client_fd, header, data);
-                 //cout << "Here 3" << endl;
-                if (header.type == 3){
-                    cout << header.seqNum << endl;
-                    highest_ack = header.seqNum;
-                }
-            }
-        } 
+        // for (auto start = std::chrono::steady_clock::now(), now = start; now < start + std::chrono::milliseconds{500} && highest_ack < seq_num + w_size - 1; now = std::chrono::steady_clock::now()){
+        //     //cout << "Here 1" << endl;
+        //     FD_ZERO(&rfds);
+        //     FD_SET(client_fd, &rfds);
+        //     int activity = select(client_fd + 1, &rfds, NULL, NULL, NULL);
+        //     if (FD_ISSET(client_fd, &rfds)){
+        //         start = std::chrono::steady_clock::now();
+        //          //cout << "Here 2" << endl;
+        //         recv_packet(client_fd, header, data);
+        //          //cout << "Here 3" << endl;
+        //         if (header.type == 3){
+        //             cout << header.seqNum << endl;
+        //             highest_ack = header.seqNum;
+        //         }
+        //     }
+        // } 
         if (highest_ack > seq_num){
             seq_num = highest_ack + 1;
         } 
