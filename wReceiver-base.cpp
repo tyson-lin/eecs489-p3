@@ -16,8 +16,6 @@
 
 using namespace std;
 
-#define MAX_PACKET_SIZE 1472
-#define HEADER_SIZE 16
 #define DATA_SIZE MAX_PACKET_SIZE-HEADER_SIZE
 
 int expected_seq_num = 0;
@@ -59,7 +57,9 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     while (1) {
         // read packet
         PacketHeader header;
-        recv_packet(server_fd, &client_addr, header, logfile, buffer);
+        if (!recv_packet(server_fd, &client_addr, &header, logfile, buffer)) {
+            continue;
+        }
 
         // Receive START command and send ACK
         if (currently_recieving == false) {
@@ -88,10 +88,6 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
             if (header.type == TYPE_DATA) {
                 cout << "Here" << endl;
                 cout << "Length: " << header.length << endl;
-                // check crc because it's a data packet
-                if (crc32(buffer, header.length) != header.checksum) {
-                    continue;
-                }
                 cout << "Sequence Number: " << header.seqNum << endl;
                 // Packet is the next desired packet
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
