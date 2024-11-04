@@ -59,7 +59,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     while (1) {
         // read packet
         PacketHeader header;
-        recv_packet(server_fd, header, buffer, logfile);
+        recv_packet(server_fd, header, logfile, buffer);
 
         // Receive START command and send ACK
         if (currently_recieving == false) {

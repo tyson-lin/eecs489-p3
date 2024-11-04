@@ -69,7 +69,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     cout << "start sent" << endl;
 
     char data[DATA_SIZE];
-    recv_packet(client_fd, header, data, logfile);
+    recv_packet(client_fd, header, logfile, data);
 
     cout << "ack recved" << endl;
     
@@ -97,7 +97,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             if (FD_ISSET(client_fd, &rfds)){
                 start = std::chrono::steady_clock::now();
                  //cout << "Here 2" << endl;
-                recv_packet(client_fd, header, data, logfile);
+                recv_packet(client_fd, header, logfile, data);
                  //cout << "Here 3" << endl;
                 if (header.type == 3){
                     cout << header.seqNum << endl;
@@ -114,7 +114,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     header.seqNum = 0;
     header.length = 0;
     send_packet(client_fd, header, logfile);
-    recv_packet(client_fd, header, data, logfile);
+    recv_packet(client_fd, header, logfile, data);
     close(client_fd);
 }
 
