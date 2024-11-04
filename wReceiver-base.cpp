@@ -55,8 +55,14 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
 
     char buffer[MAX_PACKET_SIZE];
 
-
+    fd_set rfds;
     while (1) {
+        FD_ZERO(&rfds);
+        FD_SET(server_fd, &rfds);
+        int activity = select(server_fd + 1, &rfds, NULL, NULL, NULL);
+        if (!FD_ISSET(server_fd, &rfds)){
+            continue;
+        }
         // read packet
         PacketHeader header;
         recv_packet(server_fd, &client_addr, header, logfile, buffer);
@@ -71,6 +77,8 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 // Setup output file
                 outfile_name = output_dir + "File-" + to_string(connection_count) + ".out";
                 cout << "Output file location: " << outfile_name << endl;
+                outfile.open(outfile_name);
+                outfile.close();
 
                 // Send ACK
                 PacketHeader start_response;
@@ -86,18 +94,16 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 continue;
             } 
             if (header.type == TYPE_DATA) {
-                cout << "Here" << endl;
-                cout << "Length: " << header.length << endl;
                 // check crc because it's a data packet
                 if (crc32(buffer, header.length) != header.checksum) {
                     continue;
                 }
-                cout << "Sequence Number: " << header.seqNum << endl;
+                cout << header.seqNum << " " <<  (unsigned int)expected_seq_num << " " << (unsigned int)window_size << endl;
                 // Packet is the next desired packet
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
                     // TODO: PRINT BUFFER TO FILE
-                    cout << buffer << endl;
-                    outfile.open(outfile_name);
+                    ++expected_seq_num;
+                    outfile.open(outfile_name, ios::app);
                     if (outfile.is_open()) {
                         cout << "Printing to " << outfile_name << endl;
                         outfile << buffer;
@@ -111,12 +117,11 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                         bool packet_found = false;
                         for (size_t i = 0; i < outstanding_packets.size(); i++) {
                             if (outstanding_packets[i].header.seqNum == expected_seq_num) {
+                                cout << "removing packet " << outstanding_packets[i].header.seqNum << endl;
                                 expected_seq_num++;
                                 packet_found = true;
                                 outstanding_packets.erase(outstanding_packets.begin()+i);
-                                // TODO: PRINT BUFFER TO FILE
-                                cout << buffer << endl;
-                                outfile.open(outfile_name);
+                                outfile.open(outfile_name,ios::app);
                                 if (outfile.is_open()) {
                                     cout << "Printing to " << outfile_name << endl;
                                     outfile << buffer;
@@ -125,24 +130,20 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                                 }
                                 outfile.close();
                                 // ======================================================================
-                                cout << "Here1" << endl;
                                 break;
                             }
                         }
 
                         // no interesting packets in outstanding set
                         if (packet_found == false) {
-                            cout << "Here2" << endl;
                             break;
                         }
                     }
-                    cout << "Here3" << endl;
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
-                    expected_seq_num++;
                     send_packet(server_fd, client_addr, ack_header, logfile);
                 } else 
                 // Packet within range
-                if (header.seqNum >= (unsigned int)expected_seq_num + (unsigned int)window_size) {
+                if (header.seqNum < (unsigned int)expected_seq_num + (unsigned int)window_size) {
                     Packet packet;
                     packet.header = header;
                     for (unsigned int i = 0; i < header.length; i++) {
@@ -154,10 +155,12 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     bool packet_found = false;
                     for (size_t i = 0; i < outstanding_packets.size(); i++) {
                         if (outstanding_packets[i].header.seqNum == header.seqNum) {
+                            cout << "already outstanding" << endl;
                             packet_found = true;
                         }
                     }
                     if (packet_found == false) {
+                        cout << "adding packet " << packet.header.seqNum << endl;
                         outstanding_packets.push_back(packet);
                     } 
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
@@ -165,6 +168,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 }
                 else {
                     // didn't get expected, so send ack for expected seq num
+                    cout << "bad pack" << endl;
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
                     send_packet(server_fd, client_addr, ack_header, logfile);
                 }

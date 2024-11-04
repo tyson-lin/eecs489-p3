@@ -40,4 +40,4 @@ wReceiver-opt.o: wReceiver-opt.cpp
 
 # Clean rule
 clean:
-	rm -f *.o wSender_base
+	rm -f *.o wSender-base wReceiver-base

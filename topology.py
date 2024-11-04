@@ -43,5 +43,9 @@ if __name__ == '__main__':
     h1 = net.get('h1')
     h2 = net.get('h2')
 
+    h1.cmd("make clean")
+    h1.cmd("make")
+
+    h1.cmd("./wReceiver-base 1024 10 out rout.txt >out.txt&")
     CLI(net)
     #net.stop()

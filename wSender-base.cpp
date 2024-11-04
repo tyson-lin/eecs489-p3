@@ -74,11 +74,11 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
 
     cout << "ack recved" << endl;
     
-    int highest_ack = -1;
+    int highest_ack = 0;
     int seq_num = 0;
     fd_set rfds;
     int curr_index = 0;
-    while (highest_ack != num_packets - 1) {
+    while (highest_ack != num_packets) {
         int w_size = min(window_size, num_packets - seq_num);
         for (int i = seq_num; i < seq_num + w_size; ++i){
             string data;
@@ -89,24 +89,20 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             curr_index += header.length;
             send_packet(client_fd, server_addr, header, logfile, data.c_str());
         }
-        for (auto start = std::chrono::steady_clock::now(), now = start; now < start + std::chrono::milliseconds{500} && highest_ack < seq_num + w_size - 1; now = std::chrono::steady_clock::now()){
-            //cout << "Here 1" << endl;
+        for (auto start = std::chrono::steady_clock::now(), now = start; now - start < std::chrono::milliseconds{500} && highest_ack < seq_num + w_size; now = std::chrono::steady_clock::now()){
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
             int activity = select(client_fd + 1, &rfds, NULL, NULL, NULL);
             if (FD_ISSET(client_fd, &rfds)){
-                start = std::chrono::steady_clock::now();
-                 //cout << "Here 2" << endl;
                 recv_packet(client_fd, &server_addr, header, logfile, data);
-                 //cout << "Here 3" << endl;
+                start = std::chrono::steady_clock::now();
                 if (header.type == 3){
-                    cout << header.seqNum << endl;
                     highest_ack = header.seqNum;
                 }
             }
         } 
         if (highest_ack > seq_num){
-            seq_num = highest_ack + 1;
+            seq_num = highest_ack;
         } 
         cout << highest_ack << " " << seq_num << " " << num_packets << endl;
     }
