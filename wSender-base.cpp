@@ -89,8 +89,13 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             cout << "Here 1" << endl;
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
-            int activity = select(client_fd + 1, &rfds, NULL, NULL, NULL);
-            cout << "Here 5" << endl;
+
+            struct timeval timeout;
+            timeout.tv_sec = 0;        // seconds
+            timeout.tv_usec = 500000;  // microseconds (500 milliseconds)
+
+            int activity = select(client_fd + 1, &rfds, NULL, NULL, &timeout);
+            
             if (FD_ISSET(client_fd, &rfds)){
                 start = std::chrono::steady_clock::now();
                 cout << "Here 2" << endl;
