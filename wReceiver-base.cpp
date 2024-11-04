@@ -59,7 +59,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     while (1) {
         // read packet
         PacketHeader header;
-        recv_packet(server_fd, server_addr, header, logfile, buffer);
+        recv_packet(server_fd, client_addr, header, logfile, buffer);
 
         // Receive START command and send ACK
         if (currently_recieving == false) {
@@ -77,7 +77,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 start_response.type = TYPE_ACK;
                 start_response.seqNum = header.seqNum;
                 start_response.length = 0;
-                send_packet(server_fd, server_addr, start_response, logfile);
+                send_packet(server_fd, client_addr, start_response, logfile);
 
 
             } 
@@ -139,7 +139,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     cout << "Here3" << endl;
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
                     expected_seq_num++;
-                    send_packet(server_fd, server_addr, ack_header, logfile);
+                    send_packet(server_fd, client_addr, ack_header, logfile);
                 } else 
                 // Packet within range
                 if (header.seqNum >= (unsigned int)expected_seq_num + (unsigned int)window_size) {
@@ -161,12 +161,12 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                         outstanding_packets.push_back(packet);
                     } 
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
-                    send_packet(server_fd, server_addr, ack_header, logfile);
+                    send_packet(server_fd, client_addr, ack_header, logfile);
                 }
                 else {
                     // didn't get expected, so send ack for expected seq num
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
-                    send_packet(server_fd, server_addr, ack_header, logfile);
+                    send_packet(server_fd, client_addr, ack_header, logfile);
                 }
             } 
             if (header.type == TYPE_END) {
@@ -176,7 +176,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 end_response.type = TYPE_ACK;
                 end_response.seqNum = header.seqNum;
                 end_response.length = 0;
-                send_packet(server_fd, server_addr, end_response, logfile);
+                send_packet(server_fd, client_addr, end_response, logfile);
 
                 // set internal state
                 currently_recieving = false;
