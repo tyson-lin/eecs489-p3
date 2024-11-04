@@ -78,6 +78,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
         int w_size = min(window_size, num_packets - seq_num);
         for (int i = seq_num; i < seq_num + w_size; ++i){
             string data;
+            cout << data.c_str() << endl << endl << endl;
             header.type = 2;
             header.seqNum = i;
             header.length = min(DATA_SIZE, (int)s.size() - curr_index);
