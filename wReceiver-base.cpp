@@ -59,7 +59,7 @@ void recv_packet(int server_fd, PacketHeader& header, char* data){
     recvfrom(server_fd,&header.length, 4, MSG_WAITALL,(sockaddr*)&client_addr, &len);
     recvfrom(server_fd,&header.checksum, 4, MSG_WAITALL,(sockaddr*)&client_addr, &len);
     if (header.length > 0){
-        recvfrom(server_fd,data, header.length, MSG_WAITALL,(sockaddr*)&server_addr, &len);
+        recvfrom(server_fd, data, header.length, MSG_WAITALL,(sockaddr*)&server_addr, &len);
     }
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Receiving " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
@@ -161,6 +161,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                             break;
                         }
                     }
+                    cout << "HERE" << endl;
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
                     expected_seq_num++;
                     send_packet(server_fd, ack_header);
