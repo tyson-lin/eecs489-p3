@@ -5,6 +5,8 @@
 #include <iostream>
 #include <fstream>
 
+using namespace std;
+
 #define TYPE_START 0
 #define TYPE_END 1
 #define TYPE_DATA 2
