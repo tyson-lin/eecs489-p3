@@ -100,8 +100,8 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
                     highest_ack = header.seqNum;
                 }
             }
-            auto start_printable = chrono::duration_cast<chrono::milliseconds>(start);
-            auto now_printable = chrono::duration_cast<chrono::milliseconds>(now);
+            auto start_printable = std::chrono::duration_cast<std::chrono::milliseconds>(start);
+            auto now_printable = std::chrono::duration_cast<std::chrono::milliseconds>(now);
             cout << "Timer: " << start_printable.count() << " " << now_printable.count() << endl;
         } 
         cout << "Here 4" << endl;
