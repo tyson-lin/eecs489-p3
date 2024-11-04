@@ -29,6 +29,7 @@ struct PacketHeader {
 void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream& logfile, const char* data = ""){
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Sending " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
+
     header.checksum = crc32(data, header.length);
 
     unsigned int host_order_length = header.length;
@@ -74,7 +75,7 @@ bool recv_packet(int client_fd, sockaddr_in * addr, PacketHeader * header, ofstr
     logfile << header->type << " " << header->seqNum << " " << header->length << " " << header->checksum << endl;
     cout << "Receiving " << header->type << " " << header->seqNum << " " << header->length << " " << header->checksum << endl;
 
-    if (crc32(data, PACKET_SIZE) != header->checksum) {
+    if (crc32(data, header.length) != header->checksum) {
         return false;
     }
     return true;
