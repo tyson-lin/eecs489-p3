@@ -2,6 +2,7 @@
 #define __PACKET_HEADER_H__
 
 #include <sys/socket.h>
+#include <iostream>
 
 #define TYPE_START 0
 #define TYPE_END 1
@@ -16,7 +17,7 @@ struct PacketHeader
     unsigned int checksum; // 32-bit CRC
 };
 
-void send_packet(int client_fd, PacketHeader header, const char* data = ""){
+void send_packet(int client_fd, PacketHeader header, const char* data = "", ofstream logfile){
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Sending " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     header.checksum = crc32(data, header.length);
@@ -36,7 +37,7 @@ void send_packet(int client_fd, PacketHeader header, const char* data = ""){
         sendto(client_fd,data, host_order_length, 0, (sockaddr*)&server_addr, sizeof(server_addr));
     }
 }
-void recv_packet(int client_fd, PacketHeader& header, char* data){
+void recv_packet(int client_fd, PacketHeader& header, char* data, ofstream logfile){
     socklen_t len = sizeof(server_addr);
     recvfrom(client_fd,&header.type, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
     recvfrom(client_fd,&header.seqNum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
