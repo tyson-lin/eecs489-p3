@@ -44,15 +44,6 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
     memcpy(send_data+HEADER_SIZE, data, DATA_SIZE);
     cout << send_data << endl << endl << endl;
     sendto(client_fd, send_data, PACKET_SIZE, 0, (sockaddr*)&addr, sizeof(addr));
-    
-
-    // sendto(client_fd,&header.type, 4, 0, (sockaddr*)&addr, sizeof(addr));
-    // sendto(client_fd,&header.seqNum, 4, 0, (sockaddr*)&addr, sizeof(addr));
-    // sendto(client_fd,&header.length, 4, 0, (sockaddr*)&addr, sizeof(addr));
-    // sendto(client_fd,&header.checksum, 4, 0, (sockaddr*)&addr, sizeof(addr));
-    // if (header.length > 0){
-    //     sendto(client_fd,data, host_order_length, 0, (sockaddr*)&addr, sizeof(addr));
-    // }
 }
 
 bool recv_packet(int client_fd, sockaddr_in * addr, PacketHeader * header, ofstream& logfile, char* data){
@@ -61,13 +52,10 @@ bool recv_packet(int client_fd, sockaddr_in * addr, PacketHeader * header, ofstr
     char recv_data[PACKET_SIZE];
     recvfrom(client_fd, recv_data, PACKET_SIZE, MSG_WAITALL, (sockaddr*)addr, &len);
 
-    // recvfrom(client_fd,&header.type, 4, MSG_WAITALL,(sockaddr*)addr, &len);
-    // recvfrom(client_fd,&header.seqNum, 4, MSG_WAITALL,(sockaddr*)addr, &len);
-    // recvfrom(client_fd,&header.length, 4, MSG_WAITALL,(sockaddr*)addr, &len);
-    // recvfrom(client_fd,&header.checksum, 4, MSG_WAITALL,(sockaddr*)addr, &len);
-    cout << recv_data << endl << endl << endl;
+    
     memcpy(header, recv_data, HEADER_SIZE);
     memcpy(data, recv_data+HEADER_SIZE, DATA_SIZE);
+    cout << data << endl << endl << endl;
     
 
     header->type = ntohl(header->type);
