@@ -85,7 +85,9 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             curr_index += header.length;
             send_packet(client_fd, server_addr, header, logfile, data.c_str());
         }
-        for (auto start = std::chrono::steady_clock::now(), now = start; std::chrono::duration_cast<std::chrono::milliseconds>(now-start) < 500 && highest_ack < seq_num + w_size - 1; now = std::chrono::steady_clock::now()){
+        for (auto start = std::chrono::steady_clock::now(), now = start; 
+             (std::chrono::duration_cast<std::chrono::milliseconds>(now-start)).count() < 500 && highest_ack < seq_num + w_size - 1; 
+             now = std::chrono::steady_clock::now()){
             cout << "Here 1" << endl;
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
