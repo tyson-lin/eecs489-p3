@@ -86,7 +86,6 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             header.length = min(DATA_SIZE, (int)s.size() - curr_index);
             data = s.substr(curr_index, header.length);
             curr_index += header.length;
-            header.checksum = crc32(data.c_str(),header.length);
             send_packet(client_fd, server_addr, header, logfile, data.c_str());
         }
         for (auto start = std::chrono::steady_clock::now(), now = start; now < start + std::chrono::milliseconds{500} && highest_ack < seq_num + w_size - 1; now = std::chrono::steady_clock::now()){
