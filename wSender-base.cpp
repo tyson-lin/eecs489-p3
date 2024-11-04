@@ -105,7 +105,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     int seq_num = 0;
     fd_set rfds;
     int curr_index = 0;
-    while (highest_ack != num_packets) {
+    while (highest_ack != num_packets - 1) {
         int w_size = min(window_size, num_packets - seq_num);
         for (int i = seq_num; i < seq_num + w_size; ++i){
             string data;
@@ -136,7 +136,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
         if (highest_ack > seq_num){
             seq_num = highest_ack + 1;
         } 
-        cout << highest_ack << " " << seq_num << endl;
+        cout << highest_ack << " " << seq_num << " " << num_packets << endl;
     }
     header.type = 1;
     header.seqNum = 0;
