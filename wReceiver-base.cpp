@@ -59,12 +59,13 @@ void send_packet(int client_fd, PacketHeader header, const char* data = ""){
         sendto(client_fd,data, host_order_length, 0, (sockaddr*)&server_addr, sizeof(server_addr));
     }
 }
+
 void recv_packet(int client_fd, PacketHeader& header, char* data){
     socklen_t len = sizeof(server_addr);
-    recvfrom(client_fd,&header.type, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
-    recvfrom(client_fd,&header.seqNum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
-    recvfrom(client_fd,&header.length, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
-    recvfrom(client_fd,&header.checksum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
+    recvfrom(client_fd,header.type, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
+    recvfrom(client_fd,header.seqNum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
+    recvfrom(client_fd,header.length, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
+    recvfrom(client_fd,header.checksum, 4, MSG_WAITALL,(sockaddr*)&server_addr, &len);
 
     header.type = ntohl(header.type);
     header.seqNum = ntohl(header.seqNum);
