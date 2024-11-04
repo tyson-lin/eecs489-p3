@@ -66,7 +66,7 @@ bool recv_packet(int client_fd, sockaddr_in * addr, PacketHeader * header, ofstr
     // recvfrom(client_fd,&header.checksum, 4, MSG_WAITALL,(sockaddr*)addr, &len);
 
     memcpy(header, recv_data, HEADER_SIZE);
-    memcpy(data, recv_data+HEADER_SIZE+1, DATA_SIZE);
+    memcpy(data, recv_data+HEADER_SIZE, DATA_SIZE);
     cout << recv_data << endl << endl << endl;
 
     header->type = ntohl(header->type);
