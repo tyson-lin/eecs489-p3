@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <iostream>
 #include <fstream>
+#include <cstring>
 
 #include "crc32.h"
 
