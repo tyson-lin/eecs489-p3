@@ -73,13 +73,8 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 outfile.close();
 
                 // Send ACK
-                PacketHeader start_response;
-                start_response.type = TYPE_ACK;
-                start_response.seqNum = header.seqNum;
-                start_response.length = 0;
+                PacketHeader start_response = {TYPE_ACK, header.seqNum, 0, 0};
                 send_packet(server_fd, client_addr, start_response, logfile);
-
-
             } 
         } else if (currently_recieving == true) {
             if (header.type == TYPE_START) {
@@ -92,6 +87,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 // Packet is the next desired packet
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
                     // TODO: PRINT BUFFER TO FILE
+                    cout << buffer << endl << endl << endl;
                     outfile.open(outfile_name, ios::app);
                     if (outfile.is_open()) {
                         cout << "Printing to " << outfile_name << endl;
@@ -166,10 +162,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
             if (header.type == TYPE_END) {
 
                 // generate end response
-                PacketHeader end_response;
-                end_response.type = TYPE_ACK;
-                end_response.seqNum = header.seqNum;
-                end_response.length = 0;
+                PacketHeader end_response = {TYPE_ACK, header.seqNum, 0, 0};
                 send_packet(server_fd, client_addr, end_response, logfile);
 
                 // set internal state
