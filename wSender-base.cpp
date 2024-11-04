@@ -101,6 +101,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
                 }
             }
         } 
+        cout << "Here 4" << endl;
         if (highest_ack > seq_num){
             seq_num = highest_ack + 1;
         } 
