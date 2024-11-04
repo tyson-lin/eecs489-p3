@@ -98,7 +98,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 if (crc32(buffer, header.length) != header.checksum) {
                     continue;
                 }
-                cout << header.seqNum << " " <<  (unsigned int)expected_seq_num << " " << (unsigned int)window_size << endl;
+                //cout << header.seqNum << " " <<  (unsigned int)expected_seq_num << " " << (unsigned int)window_size << endl;
                 // Packet is the next desired packet
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
                     // TODO: PRINT BUFFER TO FILE
@@ -143,7 +143,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     send_packet(server_fd, client_addr, ack_header, logfile);
                 } else 
                 // Packet within range
-                if (header.seqNum < (unsigned int)expected_seq_num + (unsigned int)window_size) {
+                if (header.seqNum < (unsigned int)expected_seq_num + (unsigned int)window_size && header.seqNum > (unsigned int)expected_seq_num) {
                     Packet packet;
                     packet.header = header;
                     for (unsigned int i = 0; i < header.length; i++) {
@@ -169,8 +169,8 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 else {
                     // didn't get expected, so send ack for expected seq num
                     cout << "bad pack" << endl;
-                    PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
-                    send_packet(server_fd, client_addr, ack_header, logfile);
+                    //PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
+                    //send_packet(server_fd, client_addr, ack_header, logfile);
                 }
             } 
             if (header.type == TYPE_END) {

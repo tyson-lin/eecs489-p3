@@ -20,6 +20,7 @@
 #include <vector>
 #include "PacketHeader.h"
 #include "crc32.h"
+#include <sys/time.h>
 
 using namespace std;
 
@@ -30,6 +31,18 @@ using namespace std;
 struct sockaddr_in server_addr, client_addr;
 
 ofstream logfile;
+
+int send_packet(int client_fd, int seqNum, string& s, int index){
+    string data;
+    PacketHeader header;
+    header.type = 2;
+    header.seqNum = seqNum;
+    header.length = min(DATA_SIZE, (int)s.size() - index);
+    data = s.substr(index, header.length);
+    index += header.length;
+    send_packet(client_fd, server_addr, header, logfile, data.c_str());
+    return index;
+}
 
 void sender(string r_ip, int r_port, int window_size, string input, string log_filename){
     logfile = ofstream(log_filename);
@@ -81,26 +94,27 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     while (highest_ack != num_packets) {
         int w_size = min(window_size, num_packets - seq_num);
         for (int i = seq_num; i < seq_num + w_size; ++i){
-            string data;
-            header.type = 2;
-            header.seqNum = i;
-            header.length = min(DATA_SIZE, (int)s.size() - curr_index);
-            data = s.substr(curr_index, header.length);
-            curr_index += header.length;
-            send_packet(client_fd, server_addr, header, logfile, data.c_str());
+            curr_index = send_packet(client_fd, i,s,curr_index);
         }
-        for (auto start = std::chrono::steady_clock::now(), now = start; now - start < std::chrono::milliseconds{500} && highest_ack < seq_num + w_size; now = std::chrono::steady_clock::now()){
+        auto start = std::chrono::steady_clock::now();
+        auto end = start + std::chrono::milliseconds(500);
+        while (start < end && highest_ack < seq_num + w_size){
+            start = std::chrono::steady_clock::now();
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
-            int activity = select(client_fd + 1, &rfds, NULL, NULL, NULL);
+            timeval timeout;
+            timeout.tv_sec = 0.5;
+            int activity = select(client_fd + 1, &rfds, NULL, NULL, &timeout);
             if (FD_ISSET(client_fd, &rfds)){
                 recv_packet(client_fd, &server_addr, header, logfile, data);
-                start = std::chrono::steady_clock::now();
                 if (header.type == 3){
                     highest_ack = header.seqNum;
+                    end = start + std::chrono::milliseconds(500);
+                    cout << "help" << endl;
                 }
             }
         } 
+        
         if (highest_ack > seq_num){
             seq_num = highest_ack;
         } 

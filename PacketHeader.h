@@ -63,6 +63,7 @@ void recv_packet(int client_fd, sockaddr_in *addr, PacketHeader& header, ofstrea
     header.seqNum = *static_cast<int *>(static_cast<void*>(message + 4));
     header.length = *static_cast<int *>(static_cast<void*>(message + 8));
     header.checksum = *static_cast<int *>(static_cast<void*>(message + 12));
+    data[header.length] = '\0';
 
     
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
