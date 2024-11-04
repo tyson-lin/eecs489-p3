@@ -26,7 +26,7 @@ ofstream outfile;
 
 struct Packet {
     PacketHeader header;
-    char data[MAX_PACKET_SIZE];
+    char data[PACKET_SIZE];
 };
 vector<Packet> outstanding_packets;
 
