@@ -67,6 +67,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 expected_seq_num = 0;
 
                 // Setup output file
+                output_dir.erase(0,1);
                 outfile_name = output_dir + "/" + "File-" + to_string(connection_count) + ".out";
                 cout << "Output file location: " << outfile_name << endl;
                 outfile.open(outfile_name);
