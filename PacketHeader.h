@@ -41,7 +41,7 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
 
     char send_data[PACKET_SIZE];
     memcpy(send_data, &header, HEADER_SIZE);
-    memcpy(send_data+HEADER_SIZE, data, DATA_SIZE);
+    memcpy(send_data+HEADER_SIZE+1, data, DATA_SIZE);
     cout << send_data << endl << endl << endl;
     sendto(client_fd, send_data, PACKET_SIZE, 0, (sockaddr*)&addr, sizeof(addr));
 }
@@ -55,10 +55,6 @@ bool recv_packet(int client_fd, sockaddr_in * addr, PacketHeader * header, ofstr
     
     memcpy(header, recv_data, HEADER_SIZE);
     memcpy(data, recv_data+HEADER_SIZE, DATA_SIZE);
-    data[-1] = '\0';
-    data[-2] = '\0';
-    data[-3] = '\0';
-    data[-4] = '\0';
     cout << data << endl << endl << endl;
     
 
