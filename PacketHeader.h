@@ -39,7 +39,7 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
     sendto(client_fd,&header.length, 4, 0, (sockaddr*)&addr, sizeof(addr));
     sendto(client_fd,&header.checksum, 4, 0, (sockaddr*)&addr, sizeof(addr));
     if (header.length > 0){
-        sendto(client_fd,data, host_order_length, 0, (sockaddr*)&server_addr, sizeof(server_addr));
+        sendto(client_fd,data, host_order_length, 0, (sockaddr*)&addr, sizeof(addr));
     }
 }
 
