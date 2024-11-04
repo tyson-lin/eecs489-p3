@@ -23,8 +23,6 @@
 
 using namespace std;
 
-#define DATA_SIZE MAX_PACKET_SIZE-HEADER_SIZE
-
 struct sockaddr_in server_addr, client_addr;
 
 ofstream logfile;

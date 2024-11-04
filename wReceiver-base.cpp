@@ -16,8 +16,6 @@
 
 using namespace std;
 
-#define DATA_SIZE MAX_PACKET_SIZE-HEADER_SIZE
-
 int expected_seq_num = 0;
 bool currently_recieving = false;
 
