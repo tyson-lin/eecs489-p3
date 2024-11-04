@@ -92,7 +92,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
 
             struct timeval timeout;
             timeout.tv_sec = 0;        // seconds
-            timeout.tv_usec = 500000;  // microseconds (500 milliseconds)
+            timeout.tv_usec = 1000;  // microseconds (500 milliseconds)
 
             int activity = select(client_fd + 1, &rfds, NULL, NULL, &timeout);
             
