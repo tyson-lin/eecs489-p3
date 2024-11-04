@@ -69,6 +69,8 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 // Setup output file
                 outfile_name = output_dir + "File-" + to_string(connection_count) + ".out";
                 cout << "Output file location: " << outfile_name << endl;
+                outfile.open(outfile_name);
+                outfile.close();
 
                 // Send ACK
                 PacketHeader start_response;
@@ -90,7 +92,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 // Packet is the next desired packet
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
                     // TODO: PRINT BUFFER TO FILE
-                    outfile.open(outfile_name);
+                    outfile.open(outfile_name, ios::app);
                     if (outfile.is_open()) {
                         cout << "Printing to " << outfile_name << endl;
                         outfile << buffer;
