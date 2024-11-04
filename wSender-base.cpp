@@ -100,7 +100,9 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
                     highest_ack = header.seqNum;
                 }
             }
-            cout << "Timer: " << start << " " << now << endl;
+            auto start_printable = chrono::duration_cast<chrono::milliseconds>(start);
+            auto now_printable = chrono::duration_cast<chrono::milliseconds>(now);
+            cout << "Timer: " << start_printable << " " << now_printable << endl;
         } 
         cout << "Here 4" << endl;
         if (highest_ack > seq_num){
