@@ -110,7 +110,9 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             FD_SET(client_fd, &rfds);
             timeval timeout;
             timeout.tv_sec = 0.5;
+            cout << "Here 1" << endl;
             int activity = select(client_fd + 1, &rfds, NULL, NULL, &timeout);
+            cout << "Here 2" << endl;
             if (FD_ISSET(client_fd, &rfds)){
                 recv_packet(client_fd, &server_addr, header, logfile, data);
                 if (header.type == 3){
