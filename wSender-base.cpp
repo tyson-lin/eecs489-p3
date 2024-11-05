@@ -30,6 +30,8 @@ using namespace std;
 
 struct sockaddr_in server_addr, client_addr;
 
+unsigned int start_seq_num = 0;
+
 ofstream logfile;
 
 int send_packet(int client_fd, int seqNum, string& s, int index){
@@ -78,6 +80,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     PacketHeader header;
     header.type = 0;
     header.length = 0;
+    start_seq_num = header.seqNum;
     send_packet(client_fd, server_addr, header, logfile);
 
     cout << "start sent" << endl;
@@ -121,7 +124,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
         cout << highest_ack << " " << seq_num << " " << num_packets << endl;
     }
     header.type = 1;
-    header.seqNum = 0;
+    header.seqNum = start_seq_num;
     header.length = 0;
     send_packet(client_fd, server_addr, header, logfile);
     recv_packet(client_fd, &server_addr, header, logfile, data);
