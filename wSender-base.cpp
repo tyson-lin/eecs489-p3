@@ -125,7 +125,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
         if (highest_ack > seq_num){
             seq_num = highest_ack;
         } 
-        cout << highest_ack << " " << seq_num << " " << num_packets << endl;
+        cout << highest_ack << " " << seq_num << " " << w_size << endl;
     }
     header.type = 1;
     header.seqNum = start_seq_num;
