@@ -38,6 +38,9 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
 
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Sending " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
+    cout << "=================================================================================="
+    cout << data << endl;
+    cout << "=================================================================================="
     unsigned int host_order_length = header.length;
 
     header.type = htonl(header.type);
@@ -51,7 +54,7 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
     int_to_byte_array(header.length, message + 8);
     int_to_byte_array(header.checksum, message + 12);
     memcpy(message+16, data, host_order_length);
-    cout << "Sent data: " << data << endl << endl << endl;
+    c
     sendto(client_fd,message, MAX_PACKET_SIZE, 0, (sockaddr*)&addr, sizeof(addr));
 }
 
@@ -66,11 +69,12 @@ void recv_packet(int client_fd, sockaddr_in *addr, PacketHeader& header, ofstrea
     header.checksum = *static_cast<int *>(static_cast<void*>(message + 12));
     data[header.length] = '\0';
 
-    cout << "Received data: " << data << endl << endl << endl;
 
-    
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Receiving " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
+    cout << "=================================================================================="
+    cout << data << endl;
+    cout << "=================================================================================="
 }
 
 #endif
