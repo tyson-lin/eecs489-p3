@@ -52,7 +52,7 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
     int_to_byte_array(header.checksum, message + 12);
     memcpy(message+16, data, host_order_length);
     cout << "Sent data: " << data << endl << endl << endl;
-    sendto(client_fd,message, HEADER_SIZE + host_order_length, 0, (sockaddr*)&addr, sizeof(addr));
+    sendto(client_fd,message, MAX_PACKET_SIZE, 0, (sockaddr*)&addr, sizeof(addr));
 }
 
 void recv_packet(int client_fd, sockaddr_in *addr, PacketHeader& header, ofstream& logfile, char* data){
