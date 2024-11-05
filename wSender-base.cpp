@@ -21,6 +21,7 @@
 #include "PacketHeader.h"
 #include "crc32.h"
 #include <sys/time.h>
+#include <ctime>
 
 using namespace std;
 
@@ -80,7 +81,9 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     PacketHeader header;
     header.type = 0;
     header.length = 0;
-    start_seq_num = header.seqNum;
+    srand((int)time(0));
+    start_seq_num = rand();
+    header.seqNum = start_seq_num;
     send_packet(client_fd, server_addr, header, logfile);
 
     cout << "start sent" << endl;
