@@ -51,6 +51,7 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
     int_to_byte_array(header.length, message + 8);
     int_to_byte_array(header.checksum, message + 12);
     memcpy(message+16, data, host_order_length);
+    cout << data << endl << endl << endl;
     sendto(client_fd,message, HEADER_SIZE + host_order_length, 0, (sockaddr*)&addr, sizeof(addr));
 }
 
@@ -63,7 +64,9 @@ void recv_packet(int client_fd, sockaddr_in *addr, PacketHeader& header, ofstrea
     header.seqNum = *static_cast<int *>(static_cast<void*>(message + 4));
     header.length = *static_cast<int *>(static_cast<void*>(message + 8));
     header.checksum = *static_cast<int *>(static_cast<void*>(message + 12));
-    data[header.length-1] = '\0';
+    data[header.length] = '\0';
+
+    cout << data << endl << endl << endl;
 
     
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
