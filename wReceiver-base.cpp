@@ -170,8 +170,8 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 else {
                     // didn't get expected, so send ack for expected seq num
                     cout << "bad pack" << endl;
-                    //PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
-                    //send_packet(server_fd, client_addr, ack_header, logfile);
+                    PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
+                    send_packet(server_fd, client_addr, ack_header, logfile);
                 }
             } 
             if (header.type == TYPE_END) {
