@@ -122,29 +122,21 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             FD_SET(client_fd, &rfds);
             timeval timeout;
             timeout.tv_sec = 0.5;
-            cout << "Here 1" << endl;
             int activity = select(client_fd + 1, &rfds, NULL, NULL, &timeout);
-            cout << "Here 2" << endl;
             if (FD_ISSET(client_fd, &rfds)){
-                cout << "Here 3" << endl;
                 recv_packet(client_fd, &server_addr, header, logfile, data);
-                cout << "Here 4" << endl;
                 if (header.type == 3){
                     highest_ack = header.seqNum;
                     start = std::chrono::steady_clock::now();
-                    cout << "help" << endl;
                 }
             }
-            cout << highest_ack << " " << seq_num << " " << w_size << endl;
             now = std::chrono::steady_clock::now();
             duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
-            cout << "Elapsed time: " << duration.count() << endl;
         } 
         
         if (highest_ack > seq_num){
             seq_num = highest_ack;
         } 
-        cout << highest_ack << " " << seq_num << " " << w_size << endl;
     }
     header.type = 1;
     header.seqNum = start_seq_num;
