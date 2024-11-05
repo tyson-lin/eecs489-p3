@@ -119,7 +119,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                                 packet_found = true;
                                 outfile.open(outfile_name,ios::app);
                                 if (outfile.is_open()) {
-                                    outfile << oustanding_packets[i].data;
+                                    outfile << outstanding_packets[i].data;
                                 } 
                                 outfile.close();
                                 outstanding_packets.erase(outstanding_packets.begin()+i);
