@@ -103,9 +103,9 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             curr_index = send_packet(client_fd, i,s,curr_index);
         }
         auto start = std::chrono::steady_clock::now();
-        auto end = start + std::chrono::milliseconds(500);
-        while (start < end && highest_ack < seq_num + w_size){
-            start = std::chrono::steady_clock::now();
+        auto now = start;
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        while (duration.count() < 500 && highest_ack < seq_num + w_size){
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
             timeval timeout;
@@ -115,11 +115,13 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
                 recv_packet(client_fd, &server_addr, header, logfile, data);
                 if (header.type == 3){
                     highest_ack = header.seqNum;
-                    end = start + std::chrono::milliseconds(500);
+                    start = std::chrono::steady_clock::now();
                     cout << "help" << endl;
                 }
             }
             cout << highest_ack << " " << seq_num << " " << w_size << endl;
+            now = std::chrono::steady_clock::now();
+            duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
         } 
         
         if (highest_ack > seq_num){
