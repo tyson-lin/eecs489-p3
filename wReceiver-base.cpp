@@ -190,7 +190,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
             } 
         }
          
-        cout << "==================================" << endl;
+        cout << "==================================" << endl << endl;
     }
 }
 
