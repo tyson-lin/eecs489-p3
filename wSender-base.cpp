@@ -78,7 +78,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     // Apply the timeout setting to the socket
     if (setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
         std::cerr << "Failed to set socket options." << std::endl;
-        close(sockfd);
+        close(client_fd);
         return -1;
     }
 
