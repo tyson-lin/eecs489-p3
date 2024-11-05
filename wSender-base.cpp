@@ -122,6 +122,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             cout << highest_ack << " " << seq_num << " " << w_size << endl;
             now = std::chrono::steady_clock::now();
             duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
+            cout << "Elapsed time: " << duration.count() << endl;
         } 
         
         if (highest_ack > seq_num){
