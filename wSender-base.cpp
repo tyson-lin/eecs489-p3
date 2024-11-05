@@ -35,7 +35,7 @@ unsigned int start_seq_num = 0;
 
 ofstream logfile;
 
-int send_packet(int client_fd, int seqNum, string& s, int index){
+int send_data_packet(int client_fd, int seqNum, string& s, int index){
     string data;
     PacketHeader header;
     header.type = 2;
@@ -112,7 +112,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     while (highest_ack != num_packets) {
         int w_size = min(window_size, num_packets - seq_num);
         for (int i = seq_num; i < seq_num + w_size; ++i){
-            curr_index = send_packet(client_fd, i,s,curr_index);
+            curr_index = send_data_packet(client_fd, i,s,curr_index);
         }
         auto start = std::chrono::steady_clock::now();
         auto now = start;
