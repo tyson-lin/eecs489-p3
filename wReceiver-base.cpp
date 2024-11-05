@@ -103,6 +103,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
                     // TODO: PRINT BUFFER TO FILE
                     expected_seq_num++;
+                    cout << "Printing packet " << header.seqNum << endl;
                     outfile.open(outfile_name, ios::app);
                     if (outfile.is_open()) {
                         outfile << buffer;
@@ -117,6 +118,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                                 //cout << "removing packet " << outstanding_packets[i].header.seqNum << endl;
                                 expected_seq_num++;
                                 packet_found = true;
+                                cout << "Printing packet " << outstanding_packets[i].header.seqNum << endl;
                                 outfile.open(outfile_name,ios::app);
                                 if (outfile.is_open()) {
                                     outfile << outstanding_packets[i].data;
