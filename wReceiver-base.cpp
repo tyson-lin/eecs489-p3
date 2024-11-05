@@ -105,10 +105,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     expected_seq_num++;
                     outfile.open(outfile_name, ios::app);
                     if (outfile.is_open()) {
-                        cout << "Printing to " << outfile_name << endl;
                         outfile << buffer;
-                    } else {
-                        cout << "Failed to open " << outfile_name << endl;
                     }
                     outfile.close();
                     // ======================================================================
@@ -117,17 +114,14 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                         bool packet_found = false;
                         for (size_t i = 0; i < outstanding_packets.size(); i++) {
                             if (outstanding_packets[i].header.seqNum == expected_seq_num) {
-                                cout << "removing packet " << outstanding_packets[i].header.seqNum << endl;
+                                //cout << "removing packet " << outstanding_packets[i].header.seqNum << endl;
                                 expected_seq_num++;
                                 packet_found = true;
                                 outstanding_packets.erase(outstanding_packets.begin()+i);
                                 outfile.open(outfile_name,ios::app);
                                 if (outfile.is_open()) {
-                                    cout << "Printing to " << outfile_name << endl;
                                     outfile << buffer;
-                                } else {
-                                    cout << "Failed to open " << outfile_name << endl;
-                                }
+                                } 
                                 outfile.close();
                                 // ======================================================================
                                 break;
@@ -155,12 +149,12 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     bool packet_found = false;
                     for (size_t i = 0; i < outstanding_packets.size(); i++) {
                         if (outstanding_packets[i].header.seqNum == header.seqNum) {
-                            cout << "already outstanding" << endl;
+                            //cout << "already outstanding" << endl;
                             packet_found = true;
                         }
                     }
                     if (packet_found == false) {
-                        cout << "adding packet " << packet.header.seqNum << endl;
+                        //cout << "adding packet " << packet.header.seqNum << endl;
                         outstanding_packets.push_back(packet);
                     } 
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
@@ -168,7 +162,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 }
                 else {
                     // didn't get expected, so send ack for expected seq num
-                    cout << "bad pack" << endl;
+                    //cout << "bad pack" << endl;
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
                     send_packet(server_fd, client_addr, ack_header, logfile);
                 }
