@@ -70,6 +70,18 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     const int enable = 1;
     setsockopt(client_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
 
+    // Set a timeout of 5 seconds
+    struct timeval timeout;
+    timeout.tv_sec = 0;  // seconds
+    timeout.tv_usec = 100000; // microseconds
+
+    // Apply the timeout setting to the socket
+    if (setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        std::cerr << "Failed to set socket options." << std::endl;
+        close(sockfd);
+        return -1;
+    }
+
     // Make socket address
     server_addr.sin_family = AF_INET;              // IPv4
     server_addr.sin_addr.s_addr = inet_addr(r_ip.c_str());  // Server IP address
