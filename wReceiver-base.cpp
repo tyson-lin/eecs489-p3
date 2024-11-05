@@ -87,8 +87,6 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 start_response.seqNum = header.seqNum;
                 start_response.length = 0;
                 send_packet(server_fd, client_addr, start_response, logfile);
-
-
             } 
         } else if (currently_recieving == true) {
             if (header.type == TYPE_START) {
@@ -99,11 +97,12 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 if (crc32(buffer, header.length) != header.checksum) {
                     continue;
                 }
+                cout << "Expected seq num: " << expected_seq_num << endl;
                 //cout << header.seqNum << " " <<  (unsigned int)expected_seq_num << " " << (unsigned int)window_size << endl;
                 // Packet is the next desired packet
                 if ((header.seqNum) == (unsigned int)expected_seq_num) {
                     // TODO: PRINT BUFFER TO FILE
-                    ++expected_seq_num;
+                    expected_seq_num++;
                     outfile.open(outfile_name, ios::app);
                     if (outfile.is_open()) {
                         cout << "Printing to " << outfile_name << endl;
