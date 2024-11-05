@@ -114,7 +114,9 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             int activity = select(client_fd + 1, &rfds, NULL, NULL, &timeout);
             cout << "Here 2" << endl;
             if (FD_ISSET(client_fd, &rfds)){
+                cout << "Here 3" << endl;
                 recv_packet(client_fd, &server_addr, header, logfile, data);
+                cout << "Here 4" << endl;
                 if (header.type == 3){
                     highest_ack = header.seqNum;
                     start = std::chrono::steady_clock::now();
