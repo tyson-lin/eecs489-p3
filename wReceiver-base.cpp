@@ -110,27 +110,23 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     outfile.close();
                     // ======================================================================
                     // sort through outstanding packets to check if we have anything of note
-                    while (true) {
+                    bool packet_found = true;
+                    while (packet_found) {
                         bool packet_found = false;
                         for (size_t i = 0; i < outstanding_packets.size(); i++) {
                             if (outstanding_packets[i].header.seqNum == expected_seq_num) {
                                 //cout << "removing packet " << outstanding_packets[i].header.seqNum << endl;
                                 expected_seq_num++;
                                 packet_found = true;
-                                outstanding_packets.erase(outstanding_packets.begin()+i);
                                 outfile.open(outfile_name,ios::app);
                                 if (outfile.is_open()) {
-                                    outfile << buffer;
+                                    outfile << outstanding_packets[i].data;
                                 } 
                                 outfile.close();
+                                outstanding_packets.erase(outstanding_packets.begin()+i);
                                 // ======================================================================
                                 break;
                             }
-                        }
-
-                        // no interesting packets in outstanding set
-                        if (packet_found == false) {
-                            break;
                         }
                     }
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
