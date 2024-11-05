@@ -119,7 +119,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
                     cout << "help" << endl;
                 }
             }
-            cout << highest_ack << " " << seq_num << " " << num_packets << endl;
+            cout << highest_ack << " " << seq_num << " " << w_size << endl;
         } 
         
         if (highest_ack > seq_num){
