@@ -54,7 +54,6 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
     int_to_byte_array(header.length, message + 8);
     int_to_byte_array(header.checksum, message + 12);
     memcpy(message+16, data, host_order_length);
-    c
     sendto(client_fd,message, MAX_PACKET_SIZE, 0, (sockaddr*)&addr, sizeof(addr));
 }
 
