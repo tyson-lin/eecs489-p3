@@ -46,6 +46,6 @@ if __name__ == '__main__':
     h1.cmd("make clean")
     h1.cmd("make")
 
-    h1.cmd("./wReceiver-base 1024 10 out rout.txt >out.txt&")
+    #h1.cmd("./wReceiver-base 1024 10 out rout.txt >out.txt&")
     CLI(net)
     #net.stop()
