@@ -119,6 +119,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
                     cout << "help" << endl;
                 }
             }
+            cout << "Here 1" << endl;
         } 
         
         if (highest_ack > seq_num){
