@@ -38,9 +38,9 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
 
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Sending " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
-    cout << "=================================================================================="
+    cout << "==================================================================================" << endl;
     cout << data << endl;
-    cout << "=================================================================================="
+    cout << "==================================================================================" << endl;
     unsigned int host_order_length = header.length;
 
     header.type = htonl(header.type);
@@ -72,9 +72,9 @@ void recv_packet(int client_fd, sockaddr_in *addr, PacketHeader& header, ofstrea
 
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Receiving " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
-    cout << "=================================================================================="
+    cout << "==================================================================================" << endl;
     cout << data << endl;
-    cout << "=================================================================================="
+    cout << "==================================================================================" << endl;
 }
 
 #endif
