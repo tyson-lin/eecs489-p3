@@ -25,10 +25,6 @@
 
 using namespace std;
 
-#define MAX_PACKET_SIZE 1472
-#define HEADER_SIZE 16
-#define DATA_SIZE MAX_PACKET_SIZE-HEADER_SIZE
-
 struct sockaddr_in server_addr, client_addr;
 
 unsigned int start_seq_num = 0;
