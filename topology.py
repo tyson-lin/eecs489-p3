@@ -17,10 +17,6 @@ import sys
 original_stdout = sys.stdout
 original_stderr = sys.stderr
 
-# CHANGE THIS!!!!
-reciever_iterations = 4
-sender_iterations = 4
-
 def print_to_terminal(line):
     sys.stdout = original_stdout
     sys.stderr = original_stderr
@@ -52,6 +48,10 @@ class AssignmentNetworks(Topo):
         
         
 if __name__ == '__main__':
+    if (len(sys.argv) != 3):
+        print_to_terminal("Usage: sudo python3 topology.py [reciever iterations] [sender iterations per receiver]")
+        exit()
+
     sys.stdout = open('/dev/null', 'w')
     sys.stderr = open('/dev/null', 'w')
     setLogLevel( 'output' )
@@ -60,7 +60,8 @@ if __name__ == '__main__':
     os.system("make")
     os.system("sudo ./clean.sh")
 
-    
+    reciever_iterations = int(sys.argv[1])
+    sender_iterations = int(sys.argv[2])
     
     total_iterations = reciever_iterations * sender_iterations
     successes = 0
