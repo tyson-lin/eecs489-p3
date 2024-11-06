@@ -50,6 +50,7 @@ class AssignmentNetworks(Topo):
 if __name__ == '__main__':
     if (len(sys.argv) != 3):
         print_to_terminal("Usage: sudo python3 topology.py [reciever iterations] [sender iterations per receiver]")
+        print_to_terminal("\tn receivers are run with a random RWND, and m senders with a random SWND are run for each receiver. Thus there will be m*n total tests ran")
         exit()
 
     sys.stdout = open('/dev/null', 'w')
