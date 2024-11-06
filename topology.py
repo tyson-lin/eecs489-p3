@@ -35,7 +35,7 @@ class AssignmentNetworks(Topo):
         
         
 if __name__ == '__main__':
-    setLogLevel( 'output' )
+    setLogLevel( 'quiet' )
 
     os.system("make clean")
     os.system("make")
@@ -45,6 +45,9 @@ if __name__ == '__main__':
     
     reciever_iterations = 2
     sender_iterations = 2
+    total_iterations = reciever_iterations * sender_iterations
+    successes = 0
+
     for i in range(0,reciever_iterations):
         RWND = secrets.randbelow(100) + 2
 
@@ -55,8 +58,6 @@ if __name__ == '__main__':
         net.start()
         h1 = net.get('h1')
         h2 = net.get('h2')
-
-        
 
         # Generate a random integer between 2 and 100
         
@@ -75,9 +76,12 @@ if __name__ == '__main__':
             log = str(RWND) + "\t" + str(SWND) + "\t"
             if not result.stdout:  # If stdout is empty, the files are the same
                 print(log + "PASS")
+                successes += 1
             else:
                 print(log + "FAIL")
 
         net.stop()
         os.system("sudo mn -c")
+
+    print("Summary: " + str(successes) + "/" + str(total_iterations) + " passed!")
     
