@@ -110,13 +110,13 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
 
     cout << "ack recved" << endl;
     
-    int highest_ack = 0;
-    int seq_num = 0;
+    unsigned int highest_ack = 0;
+    unsigned int seq_num = 0;
     fd_set rfds;
 
     while (highest_ack != num_packets) {
         unsigned int w_size = min(window_size, num_packets - seq_num);
-        for (int i = seq_num; i < seq_num + w_size; ++i){
+        for (unsigned int i = seq_num; i < seq_num + w_size; ++i){
             send_data_packet(client_fd, i, s, start_indices[i]);
         }
         auto start = std::chrono::steady_clock::now();
