@@ -65,7 +65,7 @@ if __name__ == '__main__':
         h2_cmd = "./wSender-base 10.0.0.1 8888 " + str(SWND) + " test.txt sender-log.txt &"
         h2.cmd(h2_cmd)
 
-        outfile = "out/File-" + i + ".out"
+        outfile = "out/File-" + str(i) + ".out"
         result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
         if not result.stdout:  # If stdout is empty, the files are the same
             print("The files are identical.")
