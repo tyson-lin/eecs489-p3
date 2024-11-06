@@ -130,7 +130,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                             break;
                         }
                     }
-                    PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
+                    PacketHeader ack_header = {TYPE_ACK, header.seqNum, 0, 0};
                     send_packet(server_fd, client_addr, ack_header, logfile);
                 } else 
                 // Packet within range
@@ -154,7 +154,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                         //cout << "adding packet " << packet.header.seqNum << endl;
                         outstanding_packets.push_back(packet);
                     } 
-                    PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
+                    PacketHeader ack_header = {TYPE_ACK, header.seqNum, 0, 0};
                     send_packet(server_fd, client_addr, ack_header, logfile);
                 }
             } 
