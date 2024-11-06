@@ -17,15 +17,6 @@ import sys
 original_stdout = sys.stdout
 original_stderr = sys.stderr
 
-def print_to_terminal(line):
-    sys.stdout = original_stdout
-    sys.stderr = original_stderr
-
-    print(line)
-
-    sys.stdout = open('/dev/null', 'w')
-    sys.stderr = open('/dev/null', 'w')
-
 class AssignmentNetworks(Topo):
     def __init__(self, **opts):
         Topo.__init__(self, **opts)
@@ -49,12 +40,10 @@ class AssignmentNetworks(Topo):
         
 if __name__ == '__main__':
     if (len(sys.argv) != 3):
-        print_to_terminal("Usage: sudo python3 topology.py [reciever iterations] [sender iterations per receiver]")
-        print_to_terminal("\tn receivers are run with a random RWND, and m senders with a random SWND are run for each receiver. Thus there will be m*n total tests ran")
+        print("Usage: sudo python3 topology.py [reciever iterations] [sender iterations per receiver]")
+        print("\tn receivers are run with a random RWND, and m senders with a random SWND are run for each receiver. Thus there will be m*n total tests ran")
         exit()
 
-    sys.stdout = open('/dev/null', 'w')
-    sys.stderr = open('/dev/null', 'w')
     setLogLevel( 'output' )
 
     os.system("make clean")
@@ -83,7 +72,7 @@ if __name__ == '__main__':
         h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt &"
         h1.cmd(h1_cmd)
 
-        print_to_terminal("\n\nRWND\tSWND\tSTATUS")
+        print("\n\nRWND\tSWND\tSTATUS")
         for j in range(0,sender_iterations):
             # Generate a random integer between 2 and 100
             SWND = secrets.randbelow(100) + 2
@@ -94,14 +83,14 @@ if __name__ == '__main__':
             result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
             log = str(RWND) + "\t" + str(SWND) + "\t"
             if not result.stdout:  # If stdout is empty, the files are the same
-                print_to_terminal(log + "PASS")
+                print(log + "PASS")
                 successes += 1
             else:
-                print_to_terminal(log + "FAIL")
-        print_to_terminal("\n\n")
+                print(log + "FAIL")
+        print("\n\n")
 
         net.stop()
         os.system("sudo mn -c")
 
-    print_to_terminal("\n\n\nSummary: " + str(successes) + "/" + str(total_iterations) + " tests passed!")
+    print("\n\n\nSummary: " + str(successes) + "/" + str(total_iterations) + " tests passed!")
     
