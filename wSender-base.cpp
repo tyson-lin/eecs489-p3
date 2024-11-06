@@ -75,18 +75,6 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
     const int enable = 1;
     setsockopt(client_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
 
-    // Set a timeout of 5 seconds
-    struct timeval timeout;
-    timeout.tv_sec = 0;  // seconds
-    timeout.tv_usec = 100000; // microseconds
-
-    // Apply the timeout setting to the socket
-    if (setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
-        std::cerr << "Failed to set socket options." << std::endl;
-        close(client_fd);
-        return;
-    }
-
     // Make socket address
     server_addr.sin_family = AF_INET;              // IPv4
     server_addr.sin_addr.s_addr = inet_addr(r_ip.c_str());  // Server IP address
@@ -126,7 +114,8 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
             timeval timeout;
-            timeout.tv_sec = 0.5;
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 500000;
             select(client_fd + 1, &rfds, NULL, NULL, &timeout);
             if (FD_ISSET(client_fd, &rfds)){
                 recv_packet(client_fd, &server_addr, header, logfile, data);

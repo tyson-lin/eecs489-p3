@@ -65,7 +65,10 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
         }
         // read packet
         PacketHeader header;
-        recv_packet(server_fd, &client_addr, header, logfile, buffer);
+        bool success = recv_packet(server_fd, &client_addr, header, logfile, buffer);
+        if (!success){
+            continue;
+        }
 
         // Receive START command and send ACK
         if (currently_recieving == false) {
@@ -93,10 +96,6 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                 continue;
             } 
             if (header.type == TYPE_DATA) {
-                // check crc because it's a data packet
-                if (crc32(buffer, header.length) != header.checksum) {
-                    continue;
-                }
                 cout << "Expected seq num: " << expected_seq_num << endl;
                 //cout << header.seqNum << " " <<  (unsigned int)expected_seq_num << " " << (unsigned int)window_size << endl;
                 // Packet is the next desired packet
@@ -159,12 +158,6 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                         //cout << "adding packet " << packet.header.seqNum << endl;
                         outstanding_packets.push_back(packet);
                     } 
-                    PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
-                    send_packet(server_fd, client_addr, ack_header, logfile);
-                }
-                else {
-                    // didn't get expected, so send ack for expected seq num
-                    //cout << "bad pack" << endl;
                     PacketHeader ack_header = {TYPE_ACK, (unsigned int)expected_seq_num, 0, 0};
                     send_packet(server_fd, client_addr, ack_header, logfile);
                 }
