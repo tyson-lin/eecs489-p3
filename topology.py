@@ -8,11 +8,23 @@ from mininet.net import Mininet
 from mininet.link import TCLink
 from mininet.topo import Topo
 from mininet.log import setLogLevel
-import mininet as mn
 
 import os
 import subprocess
 import secrets
+import sys
+
+original_stdout = sys.stdout
+original_stderr = sys.stderr
+
+def print_to_terminal(line):
+    sys.stdout = original_stdout
+    sys.stderr = original_stderr
+
+    print(line)
+
+    sys.stdout = open('/dev/null', 'w')
+    sys.stderr = open('/dev/null', 'w')
 
 class AssignmentNetworks(Topo):
     def __init__(self, **opts):
@@ -36,7 +48,9 @@ class AssignmentNetworks(Topo):
         
         
 if __name__ == '__main__':
-    mn.setLogLevel( 'quiet' )
+    sys.stdout = open('/dev/null', 'w')
+    sys.stderr = open('/dev/null', 'w')
+    setLogLevel( 'output' )
 
     os.system("make clean")
     os.system("make")
@@ -76,13 +90,13 @@ if __name__ == '__main__':
             result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
             log = str(RWND) + "\t" + str(SWND) + "\t"
             if not result.stdout:  # If stdout is empty, the files are the same
-                print(log + "PASS")
+                print_to_terminal(log + "PASS")
                 successes += 1
             else:
-                print(log + "FAIL")
+                print_to_terminal(log + "FAIL")
 
         net.stop()
         os.system("sudo mn -c")
 
-    print("Summary: " + str(successes) + "/" + str(total_iterations) + " passed!")
+    print_to_terminal("Summary: " + str(successes) + "/" + str(total_iterations) + " passed!")
     
