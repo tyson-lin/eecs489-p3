@@ -49,8 +49,8 @@ if __name__ == '__main__':
     os.system("make")
 
     os.system("sudo ./clean.sh")
-    h1.cmd("./wReceiver-base 8888 10 /out receiver-log.txt")
-    h2.cmd("./wSender-base 10.0.0.1 8888 20 test.txt sender-log.txt")
+    h1.cmd("./wReceiver-base 8888 10 /out receiver-log.txt &")
+    h2.cmd("./wSender-base 10.0.0.1 8888 20 test.txt sender-log.txt &")
     os.system("diff out/File-0.out test.txt")
 
     CLI(net)
