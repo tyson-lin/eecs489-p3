@@ -10,6 +10,25 @@ from mininet.topo import Topo
 from mininet.log import setLogLevel
 
 import os
+import subprocess
+import secrets
+import sys
+
+original_stdout = sys.stdout
+original_stderr = sys.stderr
+
+# CHANGE THIS!!!!
+reciever_iterations = 4
+sender_iterations = 4
+
+def print_to_terminal(line):
+    sys.stdout = original_stdout
+    sys.stderr = original_stderr
+
+    print(line)
+
+    sys.stdout = open('/dev/null', 'w')
+    sys.stderr = open('/dev/null', 'w')
 
 class AssignmentNetworks(Topo):
     def __init__(self, **opts):
@@ -33,26 +52,54 @@ class AssignmentNetworks(Topo):
         
         
 if __name__ == '__main__':
-    setLogLevel( 'info' )
-
-    # Create data network
-    topo = AssignmentNetworks()
-    net = Mininet(topo=topo, link=TCLink, autoSetMacs=True,
-           autoStaticArp=True)
-
-    # Run network
-    net.start()
-    h1 = net.get('h1')
-    h2 = net.get('h2')
+    sys.stdout = open('/dev/null', 'w')
+    sys.stderr = open('/dev/null', 'w')
+    setLogLevel( 'output' )
 
     os.system("make clean")
     os.system("make")
-
     os.system("sudo ./clean.sh")
-    h1.cmd("./wReceiver-base 8888 10 /out receiver-log.txt")
-    h2.cmd("./wSender-base 10.0.0.1 8888 20 test.txt sender-log.txt")
-    os.system("diff out/File-0.out test.txt")
 
-    CLI(net)
-    net.stop()
-    os.system("sudo mn -c")
+    
+    
+    total_iterations = reciever_iterations * sender_iterations
+    successes = 0
+
+    for i in range(0,reciever_iterations):
+        RWND = secrets.randbelow(100) + 2
+
+        # Create data network
+        topo = AssignmentNetworks()
+        net = Mininet(topo=topo, link=TCLink, autoSetMacs=True,
+            autoStaticArp=True)
+        net.start()
+        h1 = net.get('h1')
+        h2 = net.get('h2')
+
+        # Generate a random integer between 2 and 100
+        
+        h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt &"
+        h1.cmd(h1_cmd)
+
+        print_to_terminal("\n\nRWND\tSWND\tSTATUS")
+        for j in range(0,sender_iterations):
+            # Generate a random integer between 2 and 100
+            SWND = secrets.randbelow(100) + 2
+            h2_cmd = "./wSender-base 10.0.0.1 8888 " + str(SWND) + " test.txt sender-log.txt &"
+            h2.cmd(h2_cmd)
+
+            outfile = "out/File-" + str(i*sender_iterations + j) + ".out"
+            result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
+            log = str(RWND) + "\t" + str(SWND) + "\t"
+            if not result.stdout:  # If stdout is empty, the files are the same
+                print_to_terminal(log + "PASS")
+                successes += 1
+            else:
+                print_to_terminal(log + "FAIL")
+        print_to_terminal("\n\n")
+
+        net.stop()
+        os.system("sudo mn -c")
+
+    print_to_terminal("\n\n\nSummary: " + str(successes) + "/" + str(total_iterations) + " tests passed!")
+    
