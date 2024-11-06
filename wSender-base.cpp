@@ -109,7 +109,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     int seq_num = 0;
     fd_set rfds;
     int curr_index = 0, start_index = 0;
-    while (highest_ack != num_packets + 1) {
+    while (highest_ack != num_packets) {
         int w_size = min(window_size, num_packets - seq_num);
         start_index = curr_index;
         for (int i = seq_num; i < seq_num + w_size; ++i){
