@@ -57,6 +57,7 @@ if __name__ == '__main__':
     h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt &"
     h1.cmd(h1_cmd)
 
+    print("RWND\tSWND\tSTATUS")
     for i in range(0,10):
         # Generate a random integer between 2 and 100
         SWND = secrets.randbelow(100) + 2
@@ -65,7 +66,7 @@ if __name__ == '__main__':
 
         outfile = "out/File-" + str(i) + ".out"
         result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
-        log = "RWND: " + str(RWND) + " \tSWND: " + str(SWND) + "\t"
+        log = str(RWND) + "\t" + str(SWND) + "\t"
         if not result.stdout:  # If stdout is empty, the files are the same
             print(log + "PASS")
         else:
