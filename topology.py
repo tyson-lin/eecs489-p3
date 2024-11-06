@@ -48,7 +48,8 @@ if __name__ == '__main__':
 
     os.system("make clean")
     os.system("make")
-    os.system("sudo ./clean.sh")
+    os.system("rm -r out")
+    os.system("mkdir out")
 
     reciever_iterations = int(sys.argv[1])
     sender_iterations = int(sys.argv[2])
@@ -80,7 +81,6 @@ if __name__ == '__main__':
             h2.cmd(h2_cmd)
 
             outfile = "out/File-" + str(i*sender_iterations + j) + ".out"
-            print(outfile)
             result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
             log = str(RWND) + "\t" + str(SWND) + "\t"
             if not result.stdout:  # If stdout is empty, the files are the same
