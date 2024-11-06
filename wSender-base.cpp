@@ -48,7 +48,7 @@ int send_data_packet(int client_fd, int seqNum, string& s, int index){
     return index;
 }
 
-void sender(string r_ip, int r_port, int window_size, string input, string log_filename){
+void sender(string r_ip, int r_port, unsigned int window_size, string input, string log_filename){
     logfile = ofstream(log_filename);
 
     int fd = open(input.c_str(), 0);
@@ -115,7 +115,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     fd_set rfds;
 
     while (highest_ack != num_packets) {
-        int w_size = min(window_size, num_packets - seq_num);
+        unsigned int w_size = min(window_size, num_packets - seq_num);
         for (int i = seq_num; i < seq_num + w_size; ++i){
             send_data_packet(client_fd, i, s, start_indices[i]);
         }
