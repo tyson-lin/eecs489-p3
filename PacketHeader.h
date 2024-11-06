@@ -57,7 +57,7 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
 void recv_packet(int client_fd, sockaddr_in *addr, PacketHeader& header, ofstream& logfile, char* data){
     socklen_t len = sizeof(*addr);
     char message[MAX_PACKET_SIZE];
-    int size = recvfrom(client_fd, message, MAX_PACKET_SIZE, 0,(sockaddr*)addr, &len);
+    recvfrom(client_fd, message, MAX_PACKET_SIZE, 0,(sockaddr*)addr, &len);
     strcpy(data, message+16);
     header.type = *static_cast<int *>(static_cast<void*>(message));
     header.seqNum = *static_cast<int *>(static_cast<void*>(message + 4));

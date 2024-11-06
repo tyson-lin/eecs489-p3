@@ -64,7 +64,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     }
     
     //cout << "buffer = \n" << s << '\n';
-    int num_packets = (int)ceil((double) s.size() / (DATA_SIZE));
+    unsigned int num_packets = (int)ceil((double) s.size() / (DATA_SIZE));
     cout << s.size() << " bytes to send, " << num_packets << " packets" << endl;
     vector<int> start_indices(num_packets, 0); // Initialize vector of size n with all elements as -1
     for (unsigned int i = 1; i < num_packets; i++) {
@@ -127,7 +127,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
             FD_SET(client_fd, &rfds);
             timeval timeout;
             timeout.tv_sec = 0.5;
-            int activity = select(client_fd + 1, &rfds, NULL, NULL, &timeout);
+            select(client_fd + 1, &rfds, NULL, NULL, &timeout);
             if (FD_ISSET(client_fd, &rfds)){
                 recv_packet(client_fd, &server_addr, header, logfile, data);
                 if (header.type == 3){

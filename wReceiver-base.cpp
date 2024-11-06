@@ -20,7 +20,7 @@ using namespace std;
 #define HEADER_SIZE 16
 #define DATA_SIZE MAX_PACKET_SIZE-HEADER_SIZE
 
-int expected_seq_num = 0;
+unsigned int expected_seq_num = 0;
 bool currently_recieving = false;
 
 ofstream logfile;
@@ -59,7 +59,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     while (1) {
         FD_ZERO(&rfds);
         FD_SET(server_fd, &rfds);
-        int activity = select(server_fd + 1, &rfds, NULL, NULL, NULL);
+        select(server_fd + 1, &rfds, NULL, NULL, NULL);
         if (!FD_ISSET(server_fd, &rfds)){
             continue;
         }
