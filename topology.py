@@ -8,6 +8,7 @@ from mininet.net import Mininet
 from mininet.link import TCLink
 from mininet.topo import Topo
 from mininet.log import setLogLevel
+import mininet as mn
 
 import os
 import subprocess
