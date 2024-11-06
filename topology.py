@@ -52,8 +52,6 @@ if __name__ == '__main__':
 
     os.system("sudo ./clean.sh")
 
-    print("RWND=10 SWND=20")
-
     # Generate a random integer between 2 and 100
     RWND = secrets.randbelow(100) + 2
     h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt &"
@@ -67,10 +65,11 @@ if __name__ == '__main__':
 
         outfile = "out/File-" + str(i) + ".out"
         result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
+        log = "RWND: " + str(RWND) + " \tSWND: " + str(SWND) + "\t"
         if not result.stdout:  # If stdout is empty, the files are the same
-            print("The files are identical.")
+            print(log + "PASS")
         else:
-            print("The files are different.")
+            print(log + "FAIL")
 
     net.stop()
     os.system("sudo mn -c")
