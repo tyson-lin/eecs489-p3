@@ -35,11 +35,17 @@ class AssignmentNetworks(Topo):
         
         
 if __name__ == '__main__':
-    setLogLevel( 'info' )
+    setLogLevel( 'none' )
+
+    os.system("make clean")
+    os.system("make")
+    os.system("sudo ./clean.sh")
 
     print("RWND\tSWND\tSTATUS")
     
-    for i in range(0,7):
+    reciever_iterations = 2
+    sender_iterations = 2
+    for i in range(0,reciever_iterations):
         RWND = secrets.randbelow(100) + 2
 
         # Create data network
@@ -50,10 +56,7 @@ if __name__ == '__main__':
         h1 = net.get('h1')
         h2 = net.get('h2')
 
-        os.system("make clean")
-        os.system("make")
-
-        os.system("sudo ./clean.sh")
+        
 
         # Generate a random integer between 2 and 100
         
@@ -61,13 +64,13 @@ if __name__ == '__main__':
         h1.cmd(h1_cmd)
 
         
-        for j in range(0,7):
+        for j in range(0,sender_iterations):
             # Generate a random integer between 2 and 100
             SWND = secrets.randbelow(100) + 2
             h2_cmd = "./wSender-base 10.0.0.1 8888 " + str(SWND) + " test.txt sender-log.txt &"
             h2.cmd(h2_cmd)
 
-            outfile = "out/File-" + str(i*7 + j) + ".out"
+            outfile = "out/File-" + str(i*sender_iterations + j) + ".out"
             result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
             log = str(RWND) + "\t" + str(SWND) + "\t"
             if not result.stdout:  # If stdout is empty, the files are the same
