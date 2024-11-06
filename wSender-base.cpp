@@ -66,6 +66,10 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     //cout << "buffer = \n" << s << '\n';
     int num_packets = (int)ceil((double) s.size() / (DATA_SIZE));
     cout << s.size() << " bytes to send, " << num_packets << " packets" << endl;
+    vector<int> start_indices(num_packets, -1); // Initialize vector of size n with all elements as -1
+    for (unsigned int i = 1; i < num_packets; i++) {
+        start_indices[i] = start_indices[i-1] + DATA_SIZE;
+    }
 
     int client_fd  = socket(AF_INET, SOCK_DGRAM, 0);
     const int enable = 1;
@@ -109,14 +113,12 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     int highest_ack = 0;
     int seq_num = 0;
     fd_set rfds;
-    int curr_index = 0, start_index = 0;
+
     while (highest_ack != num_packets) {
         int w_size = min(window_size, num_packets - seq_num);
-        start_index = curr_index;
         for (int i = seq_num; i < seq_num + w_size; ++i){
-            curr_index = send_data_packet(client_fd, i,s,curr_index);
+            send_data_packet(client_fd, i, s, start_indices[i]);
         }
-        curr_index = start_index;
         auto start = std::chrono::steady_clock::now();
         auto now = start;
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
