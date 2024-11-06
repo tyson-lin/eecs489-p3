@@ -9,6 +9,8 @@ from mininet.link import TCLink
 from mininet.topo import Topo
 from mininet.log import setLogLevel
 
+import os
+
 class AssignmentNetworks(Topo):
     def __init__(self, **opts):
         Topo.__init__(self, **opts)
@@ -43,9 +45,10 @@ if __name__ == '__main__':
     h1 = net.get('h1')
     h2 = net.get('h2')
 
-    h1.cmd("make clean")
-    h1.cmd("make")
+    os.system("sudo ./clean.sh")
+    os.system("make clean")
+    os.system("make")
 
-    #h1.cmd("./wReceiver-base 1024 10 out rout.txt >out.txt&")
-    CLI(net)
-    #net.stop()
+    net.stop()
+    
+    os.system("sudo mn -c")
