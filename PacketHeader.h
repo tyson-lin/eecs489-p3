@@ -32,8 +32,6 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
     logfile << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
     cout << "Sending " << header.type << " " << header.seqNum << " " << header.length << " " << header.checksum << endl;
 
-    unsigned int host_order_length = header.length;
-
     header.type = htonl(header.type);
     header.seqNum = htonl(header.seqNum);
     header.length = htonl(header.length);
