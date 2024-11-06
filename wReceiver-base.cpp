@@ -26,7 +26,7 @@ ofstream outfile;
 
 struct Packet {
     PacketHeader header;
-    char data[MAX_PACKET_SIZE];
+    char data[PACKET_SIZE];
 };
 vector<Packet> outstanding_packets;
 
@@ -49,7 +49,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
     server_addr.sin_port = htons(port_num); // Port number
     bind(server_fd, (sockaddr*) &server_addr, sizeof(server_addr));
 
-    char buffer[MAX_PACKET_SIZE];
+    char buffer[PACKET_SIZE];
 
     fd_set rfds;
     while (1) {
