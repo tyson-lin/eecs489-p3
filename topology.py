@@ -70,14 +70,14 @@ if __name__ == '__main__':
 
         # Generate a random integer between 2 and 100
         
-        h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt &"
+        h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt"
         h1.cmd(h1_cmd)
 
         print("\n\nRWND\tSWND\tSTATUS")
         for j in range(0,sender_iterations):
             # Generate a random integer between 2 and 100
             SWND = secrets.randbelow(100) + 2
-            h2_cmd = "./wSender-base 10.0.0.1 8888 " + str(SWND) + " test.txt sender-log.txt &"
+            h2_cmd = "./wSender-base 10.0.0.1 8888 " + str(SWND) + " test.txt sender-log.txt"
             h2.cmd(h2_cmd)
 
             outfile = "out/File-" + str(i*sender_iterations + j) + ".out"
