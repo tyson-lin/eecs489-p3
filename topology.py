@@ -10,6 +10,7 @@ from mininet.topo import Topo
 from mininet.log import setLogLevel
 
 import os
+import subprocess
 
 class AssignmentNetworks(Topo):
     def __init__(self, **opts):
@@ -49,9 +50,25 @@ if __name__ == '__main__':
     os.system("make")
 
     os.system("sudo ./clean.sh")
+
+    print("RWND=10 SWND=20")
     h1.cmd("./wReceiver-base 8888 10 /out receiver-log.txt &")
     h2.cmd("./wSender-base 10.0.0.1 8888 20 test.txt sender-log.txt &")
-    os.system("diff out/File-0.out test.txt")
+    # Run the diff command and capture output
+    result = subprocess.run(["diff", "out/File-0.out", "test.txt"], capture_output=True, text=True)
+
+    # Check if the files are identical
+    if not result.stdout:  # If stdout is empty, the files are the same
+        print("The files are identical.")
+        # Do something here if files are the same
+        # For example:
+        # with open("log.txt", "a") as log_file:
+        #     log_file.write("Files are the same.\n")
+    else:
+        print("The files are different.")
+        # Optionally print the differences or handle them
+        print(result.stdout)
+    
 
     CLI(net)
     net.stop()
