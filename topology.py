@@ -90,6 +90,8 @@ if __name__ == '__main__':
                 print(log + "FAIL")
         print("\n\n")
 
+        os.system("ls out")
+
         net.stop()
         os.system("sudo mn -c")
 
