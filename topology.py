@@ -43,34 +43,39 @@ if __name__ == '__main__':
            autoStaticArp=True)
 
     # Run network
-    net.start()
-    h1 = net.get('h1')
-    h2 = net.get('h2')
-
-    os.system("make clean")
-    os.system("make")
-
-    os.system("sudo ./clean.sh")
-
-    # Generate a random integer between 2 and 100
-    RWND = secrets.randbelow(100) + 2
-    h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt &"
-    h1.cmd(h1_cmd)
-
     print("RWND\tSWND\tSTATUS")
-    for i in range(0,10):
+    
+    for i in range(0,7):
+        RWND = secrets.randbelow(100) + 2
+        net.start()
+        h1 = net.get('h1')
+        h2 = net.get('h2')
+
+        os.system("make clean")
+        os.system("make")
+
+        os.system("sudo ./clean.sh")
+
         # Generate a random integer between 2 and 100
-        SWND = secrets.randbelow(100) + 2
-        h2_cmd = "./wSender-base 10.0.0.1 8888 " + str(SWND) + " test.txt sender-log.txt &"
-        h2.cmd(h2_cmd)
+        
+        h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt &"
+        h1.cmd(h1_cmd)
 
-        outfile = "out/File-" + str(i) + ".out"
-        result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
-        log = str(RWND) + "\t" + str(SWND) + "\t"
-        if not result.stdout:  # If stdout is empty, the files are the same
-            print(log + "PASS")
-        else:
-            print(log + "FAIL")
+        
+        for j in range(0,7):
+            # Generate a random integer between 2 and 100
+            SWND = secrets.randbelow(100) + 2
+            h2_cmd = "./wSender-base 10.0.0.1 8888 " + str(SWND) + " test.txt sender-log.txt &"
+            h2.cmd(h2_cmd)
 
-    net.stop()
+            outfile = "out/File-" + str(i*7 + j) + ".out"
+            result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
+            log = str(RWND) + "\t" + str(SWND) + "\t"
+            if not result.stdout:  # If stdout is empty, the files are the same
+                print(log + "PASS")
+            else:
+                print(log + "FAIL")
+
+        net.stop()
+    
     os.system("sudo mn -c")
