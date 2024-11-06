@@ -66,7 +66,7 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     //cout << "buffer = \n" << s << '\n';
     int num_packets = (int)ceil((double) s.size() / (DATA_SIZE));
     cout << s.size() << " bytes to send, " << num_packets << " packets" << endl;
-    vector<int> start_indices(num_packets, -1); // Initialize vector of size n with all elements as -1
+    vector<int> start_indices(num_packets, 0); // Initialize vector of size n with all elements as -1
     for (unsigned int i = 1; i < num_packets; i++) {
         start_indices[i] = start_indices[i-1] + DATA_SIZE;
     }
