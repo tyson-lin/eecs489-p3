@@ -108,12 +108,14 @@ void sender(string r_ip, int r_port, int window_size, string input, string log_f
     int highest_ack = 0;
     int seq_num = 0;
     fd_set rfds;
-    int curr_index = 0;
+    int curr_index = 0, start_index = 0;
     while (highest_ack != num_packets) {
         int w_size = min(window_size, num_packets - seq_num);
+        start_index = curr_index;
         for (int i = seq_num; i < seq_num + w_size; ++i){
             curr_index = send_data_packet(client_fd, i,s,curr_index);
         }
+        curr_index = start_index;
         auto start = std::chrono::steady_clock::now();
         auto now = start;
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
