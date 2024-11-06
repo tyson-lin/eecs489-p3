@@ -60,7 +60,7 @@ if __name__ == '__main__':
     os.system("make")
     os.system("sudo ./clean.sh")
 
-    print("RWND\tSWND\tSTATUS")
+    
     
     total_iterations = reciever_iterations * sender_iterations
     successes = 0
@@ -81,7 +81,7 @@ if __name__ == '__main__':
         h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt &"
         h1.cmd(h1_cmd)
 
-        
+        print("\n\n\n\RWND\tSWND\tSTATUS\n\n\n")
         for j in range(0,sender_iterations):
             # Generate a random integer between 2 and 100
             SWND = secrets.randbelow(100) + 2
@@ -100,5 +100,5 @@ if __name__ == '__main__':
         net.stop()
         os.system("sudo mn -c")
 
-    print_to_terminal("Summary: " + str(successes) + "/" + str(total_iterations) + " passed!")
+    print_to_terminal("\n\n\nSummary: " + str(successes) + "/" + str(total_iterations) + " passed!")
     
