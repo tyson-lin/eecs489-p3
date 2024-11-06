@@ -37,16 +37,15 @@ class AssignmentNetworks(Topo):
 if __name__ == '__main__':
     setLogLevel( 'info' )
 
-    # Create data network
-    topo = AssignmentNetworks()
-    net = Mininet(topo=topo, link=TCLink, autoSetMacs=True,
-           autoStaticArp=True)
-
-    # Run network
     print("RWND\tSWND\tSTATUS")
     
     for i in range(0,7):
         RWND = secrets.randbelow(100) + 2
+
+        # Create data network
+        topo = AssignmentNetworks()
+        net = Mininet(topo=topo, link=TCLink, autoSetMacs=True,
+            autoStaticArp=True)
         net.start()
         h1 = net.get('h1')
         h2 = net.get('h2')
@@ -77,5 +76,5 @@ if __name__ == '__main__':
                 print(log + "FAIL")
 
         net.stop()
+        os.system("sudo mn -c")
     
-    os.system("sudo mn -c")
