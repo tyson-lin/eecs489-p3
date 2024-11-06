@@ -134,7 +134,7 @@ void receiver(int port_num, int window_size, string output_dir, string log_filen
                     send_packet(server_fd, client_addr, ack_header, logfile);
                 } else 
                 // Packet within range
-                if (header.seqNum < (unsigned int)expected_seq_num + (unsigned int)window_size && header.seqNum > (unsigned int)expected_seq_num) {
+                if (header.seqNum < (unsigned int)expected_seq_num + (unsigned int)window_size) {
                     Packet packet;
                     packet.header = header;
                     for (unsigned int i = 0; i < header.length; i++) {
