@@ -17,6 +17,10 @@ import sys
 original_stdout = sys.stdout
 original_stderr = sys.stderr
 
+# CHANGE THIS!!!!
+reciever_iterations = 4
+sender_iterations = 4
+
 def print_to_terminal(line):
     sys.stdout = original_stdout
     sys.stderr = original_stderr
@@ -58,8 +62,6 @@ if __name__ == '__main__':
 
     print("RWND\tSWND\tSTATUS")
     
-    reciever_iterations = 2
-    sender_iterations = 2
     total_iterations = reciever_iterations * sender_iterations
     successes = 0
 
