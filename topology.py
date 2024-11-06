@@ -81,7 +81,7 @@ if __name__ == '__main__':
         h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt &"
         h1.cmd(h1_cmd)
 
-        print_to_terminal("\n\n\nRWND\tSWND\tSTATUS\n\n\n")
+        print_to_terminal("\n\n\nRWND\tSWND\tSTATUS")
         for j in range(0,sender_iterations):
             # Generate a random integer between 2 and 100
             SWND = secrets.randbelow(100) + 2
@@ -96,6 +96,7 @@ if __name__ == '__main__':
                 successes += 1
             else:
                 print_to_terminal(log + "FAIL")
+        print_to_terminal("\n\n\n")
 
         net.stop()
         os.system("sudo mn -c")
