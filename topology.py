@@ -35,7 +35,7 @@ class AssignmentNetworks(Topo):
         
         
 if __name__ == '__main__':
-    setLogLevel( 'quiet' )
+    mn.setLogLevel( 'quiet' )
 
     os.system("make clean")
     os.system("make")
