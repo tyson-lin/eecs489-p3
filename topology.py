@@ -56,13 +56,13 @@ if __name__ == '__main__':
 
     # Generate a random integer between 2 and 100
     RWND = secrets.randbelow(100) + 2
-    h1_cmd = "./wReceiver-base 8888 " + RWND + " /out receiver-log.txt &"
+    h1_cmd = "./wReceiver-base 8888 " + str(RWND) + " /out receiver-log.txt &"
     h1.cmd(h1_cmd)
 
     for i in range(0,10):
         # Generate a random integer between 2 and 100
         SWND = secrets.randbelow(100) + 2
-        h2_cmd = "./wSender-base 10.0.0.1 8888 " + SWND + " test.txt sender-log.txt &"
+        h2_cmd = "./wSender-base 10.0.0.1 8888 " + str(SWND) + " test.txt sender-log.txt &"
         h2.cmd(h2_cmd)
 
         outfile = "out/File-" + i + ".out"
