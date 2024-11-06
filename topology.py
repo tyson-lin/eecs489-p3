@@ -80,6 +80,7 @@ if __name__ == '__main__':
             h2.cmd(h2_cmd)
 
             outfile = "out/File-" + str(i*sender_iterations + j) + ".out"
+            print(outfile)
             result = subprocess.run(["diff", outfile, "test.txt"], capture_output=True, text=True)
             log = str(RWND) + "\t" + str(SWND) + "\t"
             if not result.stdout:  # If stdout is empty, the files are the same
