@@ -93,8 +93,7 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
     recv_packet(client_fd, &server_addr, header, logfile, data);
 
     cout << "ack recved" << endl;
-    
-    unsigned int highest_ack = 0;
+
     unsigned int seq_num = 0;
     fd_set rfds;
 
@@ -104,7 +103,7 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
 
     bool window_moved_forward = false;
 
-    while (highest_ack != num_packets) {
+    while (window_start != num_packets) {
         
         curr_window_end = min(window_start + window_size, num_packets);
         if (window_moved_forward == true) {
@@ -127,7 +126,7 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
         cout << "Duration: " << duration.count() << endl;
         cout << "Highest ack: " << highest_ack << endl;
         cout << "Window end: " << curr_window_end << endl;
-        while (duration.count() < 500 && highest_ack <= curr_window_end) {
+        while (duration.count() < 500 && window_start <= curr_window_end) {
             
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
@@ -137,8 +136,8 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
             select(client_fd + 1, &rfds, NULL, NULL, &timeout);
             if (FD_ISSET(client_fd, &rfds)){
                 recv_packet(client_fd, &server_addr, header, logfile, data);
-                if (header.type == 3 && header.seqNum > highest_ack){
-                    highest_ack = header.seqNum;
+                if (header.type == 3 && header.seqNum > window_start){
+                    window_start = header.seqNum;
                     window_moved_forward = true;
                 }
             }
