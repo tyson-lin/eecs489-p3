@@ -98,15 +98,34 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
     unsigned int seq_num = 0;
     fd_set rfds;
 
+    unsigned int window_start = 0;
+    unsigned int curr_window_end = min(window_size, num_packets);
+    unsigned int last_window_end = curr_window_end;
+
+    bool window_moved_forward = false;
+
     while (highest_ack != num_packets) {
-        unsigned int w_size = min(window_size, num_packets - seq_num);
-        for (unsigned int i = seq_num; i < seq_num + w_size; ++i){
-            send_data_packet(client_fd, i, s, start_indices[i]);
+        
+        curr_window_end = window_start + w_size;
+        if (window_moved_forward == true) {
+            // transmit packets in window that are not in flight
+            for (unsigned int i = last_window_end; i < curr_window_end; i++) {
+                send_data_packet(client_fd, i, s, start_indices[i]);
+            }
         }
+        if (window_moved_forward == false) {
+            unsigned int w_size = min(window_size, num_packets - highest_ack);
+            for (unsigned int i = window_start; i < curr_window_end; i++) {
+                send_data_packet(client_fd, i, s, start_indices[i]);
+            }
+        }
+        last_window_end = curr_window_end;
+
+        window_moved_forward = false;
         auto start = std::chrono::steady_clock::now();
         auto now = start;
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
-        while (duration.count() < 500 && highest_ack <= seq_num){
+        while (duration.count() < 500 && highest_ack < curr_window_end) {
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
             timeval timeout;
@@ -115,17 +134,13 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
             select(client_fd + 1, &rfds, NULL, NULL, &timeout);
             if (FD_ISSET(client_fd, &rfds)){
                 recv_packet(client_fd, &server_addr, header, logfile, data);
-                if (header.type == 3){
+                if (header.type == 3 && header.seqNum > highest_ack){
                     highest_ack = header.seqNum;
-                    start = std::chrono::steady_clock::now();
+                    window_moved_forward = true;
                 }
             }
             now = std::chrono::steady_clock::now();
             duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
-        } 
-        
-        if (highest_ack > seq_num){
-            seq_num = highest_ack;
         } 
     }
     header.type = 1;
