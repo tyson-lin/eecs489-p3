@@ -125,6 +125,8 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
         auto now = start;
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
         while (duration.count() < 500 && highest_ack < curr_window_end) {
+            cout << "Highest ack: " << highest_ack << endl;
+            cout << "Window end: " << curr_window_end << endl;
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
             timeval timeout;
