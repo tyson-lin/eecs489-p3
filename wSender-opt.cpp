@@ -94,19 +94,24 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
 
     cout << "ack recved" << endl;
     
-    unsigned int highest_ack = 0;
+    unsigned int expected_seq = 0;
     unsigned int seq_num = 0;
     fd_set rfds;
 
-    while (highest_ack != num_packets) {
+    unordered_set<int> acks;
+
+    while (expected_seq != num_packets) {
         unsigned int w_size = min(window_size, num_packets - seq_num);
         for (unsigned int i = seq_num; i < seq_num + w_size; ++i){
-            send_data_packet(client_fd, i, s, start_indices[i]);
+            auto found = acks.find(i);
+            if (found == acks.end()){
+                send_data_packet(client_fd, i, s, start_indices[i]);
+            }
         }
         auto start = std::chrono::steady_clock::now();
         auto now = start;
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
-        while (duration.count() < 500 && highest_ack <= seq_num){
+        while (duration.count() < 500 && expected_seq <= seq_num + window_size){
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
             timeval timeout;
@@ -116,16 +121,19 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
             if (FD_ISSET(client_fd, &rfds)){
                 recv_packet(client_fd, &server_addr, header, logfile, data);
                 if (header.type == 3){
-                    highest_ack = header.seqNum;
                     start = std::chrono::steady_clock::now();
+                    acks.insert(header.seqNum);
+                }
+                if (header.seqNum == expected_seq){
+                    expected_seq += 1;
                 }
             }
             now = std::chrono::steady_clock::now();
             duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
         } 
         
-        if (highest_ack > seq_num){
-            seq_num = highest_ack;
+        if (expected_seq > seq_num){
+            seq_num = expected_seq;
         } 
     }
     header.type = 1;
