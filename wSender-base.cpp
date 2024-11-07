@@ -123,8 +123,6 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
         auto start = std::chrono::steady_clock::now();
         auto now = start;
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
-        cout << "Duration: " << duration.count() << endl;
-        cout << "Highest ack: " << highest_ack << endl;
         cout << "Window end: " << curr_window_end << endl;
         while (duration.count() < 500 && window_start <= curr_window_end) {
             
