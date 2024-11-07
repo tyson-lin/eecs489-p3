@@ -100,6 +100,7 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
     unordered_set<int> acks;
 
     while (expected_seq != num_packets) {
+
         unsigned int w_size = min(window_size, num_packets - seq_num);
         for (unsigned int i = seq_num; i < seq_num + w_size; ++i){
             auto found = acks.find(i);
@@ -111,6 +112,8 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
         auto now = start;
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
         while (duration.count() < 500 && expected_seq <= seq_num + window_size){
+            cout << "Expected seqence num: " << expected_seq << endl;
+            cout << "Sequence num: " << seq_num << endl; 
             FD_ZERO(&rfds);
             FD_SET(client_fd, &rfds);
             timeval timeout;
