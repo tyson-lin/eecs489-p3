@@ -40,7 +40,6 @@ void send_packet(int client_fd, sockaddr_in addr, PacketHeader header, ofstream&
     char send_data[PACKET_SIZE];
     memcpy(send_data, &header, HEADER_SIZE);
     memcpy(send_data+HEADER_SIZE, data, DATA_SIZE);
-    cout << send_data << endl << endl << endl;
     sendto(client_fd, send_data, PACKET_SIZE, 0, (sockaddr*)&addr, sizeof(addr));
 }
 
