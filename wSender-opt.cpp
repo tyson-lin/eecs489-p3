@@ -126,9 +126,12 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
                     start = std::chrono::steady_clock::now();
                     acks.insert(header.seqNum);
                 }
-                if (header.seqNum == expected_seq){
+                while (acks.find(expected_seq)) {
                     expected_seq += 1;
                 }
+                // if (header.seqNum == expected_seq){
+                //     expected_seq += 1;
+                // }
             }
             now = std::chrono::steady_clock::now();
             duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
