@@ -126,7 +126,7 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
                     start = std::chrono::steady_clock::now();
                     acks.insert(header.seqNum);
                 }
-                while (acks.find(expected_seq)) {
+                while (acks.find(expected_seq) != acks.end()) {
                     expected_seq += 1;
                 }
                 // if (header.seqNum == expected_seq){
