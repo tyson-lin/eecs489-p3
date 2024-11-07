@@ -106,7 +106,7 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
 
     while (highest_ack != num_packets) {
         
-        curr_window_end = window_start + window_size;
+        curr_window_end = min(window_start + window_size, num_packets);
         if (window_moved_forward == true) {
             // transmit packets in window that are not in flight
             for (unsigned int i = last_window_end; i < curr_window_end; i++) {
@@ -114,7 +114,6 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
             }
         }
         if (window_moved_forward == false) {
-            unsigned int w_size = min(window_size, num_packets - highest_ack);
             for (unsigned int i = window_start; i < curr_window_end; i++) {
                 send_data_packet(client_fd, i, s, start_indices[i]);
             }
