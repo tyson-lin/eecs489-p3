@@ -37,7 +37,6 @@ int send_data_packet(int client_fd, int seqNum, string& s, int index){
     header.type = 2;
     header.seqNum = seqNum;
     header.length = min(DATA_SIZE, (int)s.size() - index);
-    cout << "Size: " << (int)s.size() - index << endl;
     data = s.substr(index, header.length);
     index += header.length;
     send_packet(client_fd, server_addr, header, logfile, data.c_str());
@@ -123,7 +122,6 @@ void sender(string r_ip, int r_port, unsigned int window_size, string input, str
         auto start = std::chrono::steady_clock::now();
         auto now = start;
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
-        cout << "Window end: " << curr_window_end << endl;
         while (duration.count() < 500 && window_start <= curr_window_end) {
             
             FD_ZERO(&rfds);
